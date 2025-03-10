@@ -314,11 +314,11 @@ export default function BillingContent() {
               
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Setup Fee (One-time)</span>
+                  <span className="text-muted-foreground">Commitment Fee</span>
                   <span>$5,150.00</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">GST (8%)</span>
+                  <span className="text-muted-foreground">GST/VAT (9%)</span>
                   <span>$412.00</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 mt-2 border-t font-medium">

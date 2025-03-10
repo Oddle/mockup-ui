@@ -234,18 +234,12 @@ export default function PricingPage() {
       <div className="space-y-4 mb-12">
         <h1 className="text-4xl font-bold tracking-tight">Get Started with Oddle</h1>
         <p className="text-xl text-muted-foreground">
-          Review the products and pricing selected by your Oddle representative
+          The following is a summary of the products and their pricing.
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-4">
-          {/* Header */}
-          <div className="grid grid-cols-[1fr,2fr,1fr] gap-6 px-6 py-3 bg-muted/50 rounded-lg">
-            <div className="font-semibold">Product</div>
-            <div className="font-semibold">Pricing Details</div>
-            <div className="font-semibold text-right">Setup Fee</div>
-          </div>
           
           {/* Products */}
           {products.map((product) => (
@@ -264,7 +258,7 @@ export default function PricingPage() {
 
               <div className="text-right">
                 <div className="text-lg font-semibold text-primary">${product.setupFee}</div>
-                <div className="text-sm text-muted-foreground">One-time fee</div>
+                <div className="text-sm text-muted-foreground">Commitment Fee</div>
               </div>
             </div>
           ))}
@@ -275,8 +269,8 @@ export default function PricingPage() {
           <CardContent className="pt-6">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="font-semibold text-lg">Total Setup Fee</h3>
-                <p className="text-sm text-muted-foreground">One-time payment</p>
+                <h3 className="font-semibold text-lg">Total Commitment Fee</h3>
+                <p className="text-sm text-muted-foreground">Oddle credits will be issued to offset future usage fees.</p>
               </div>
               <div className="text-3xl font-bold text-primary">${totalSetupFee}</div>
             </div>
@@ -288,34 +282,25 @@ export default function PricingPage() {
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
               <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-2">Your Representative</h3>
+                <h3 className="font-semibold text-lg mb-2">Oddle Representative</h3>
                 <div className="space-y-1 text-sm">
                   <p className="font-medium">John Smith</p>
-                  <p className="text-muted-foreground">Account Executive</p>
                   <p className="text-muted-foreground">john.smith@oddle.me</p>
                   <p className="text-muted-foreground">+65 9123 4567</p>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push("/contact-sales")}
-                className="shrink-0"
-              >
-                Contact Representative
-              </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Action Buttons */}
-        <div className="flex flex-col items-center gap-4 mt-8">
+        <div className="flex flex-col gap-4 mt-8 items-end">
           <Button 
             size="lg"
-            className="w-full max-w-md"
+            className="w-fit"
             onClick={() => router.push("/merchant-sign-up/details")}
           >
-            Accept and Continue
+            Next
           </Button>
         </div>
       </div>
