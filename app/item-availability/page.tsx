@@ -80,7 +80,7 @@ export default function ItemAvailabilityDemo() {
         {/* Modal Edit Pattern */}
         <section>
           <h2 className="text-lg font-semibold mb-3">1. Modal</h2>
-          <p className="text-sm text-muted-foreground mb-3">Inspired by Deliveroo's availability controls</p>
+          <p className="text-sm text-muted-foreground mb-3">Inspired by Deliveroo&apos;s availability controls</p>
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
