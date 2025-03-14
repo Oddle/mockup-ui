@@ -15,7 +15,7 @@ export default function CompletionContent() {
           </div>
           
           <h1 className="text-2xl font-semibold mt-4">
-            Thank You! You're Almost Ready to Start
+            Thank You! You&apos;re Almost Ready to Start
           </h1>
         </div>
 
@@ -26,7 +26,7 @@ export default function CompletionContent() {
             <div className="space-y-2">
               <h3 className="font-medium">1. Check Your Email</h3>
               <p className="text-muted-foreground">
-                We've sent you an email with the signed agreement forms and the next steps.
+                We&apos;ve sent you an email with the signed agreement forms and the next steps.
               </p>
             </div>
 
@@ -39,7 +39,7 @@ export default function CompletionContent() {
               <ul className="space-y-2 text-muted-foreground pl-6 list-disc">
                 <li>
                   <span className="font-medium text-foreground">Hassle-Free Onboarding:</span>{" "}
-                  Send over the required information, and we'll have everything set up for you in 3 to 5 working days.
+                  Send over the required information, and we&apos;ll have everything set up for you in 3 to 5 working days.
                 </li>
                 <li>
                   <span className="font-medium text-foreground">Oddle Credits:</span>{" "}

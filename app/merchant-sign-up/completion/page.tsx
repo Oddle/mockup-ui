@@ -38,12 +38,12 @@ export default function CompletionPage() {
               <div>
                 <h3 className="font-medium">Dedicated Onboarding Assistance</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Hassle-free setup with our dedicated team. We'll handle everything for you in 3 to 5 working days.
+                  Hassle-free setup with our dedicated team. We&apos;ll handle everything for you in 3 to 5 working days.
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground mt-2 pl-4 list-disc">
                   <li>
                     <span className="text-foreground font-medium">Quick Setup:</span>{" "}
-                    Just send us your information, and we'll configure everything for you
+                    Just send us your information, and we&apos;ll configure everything for you
                   </li>
                   <li>
                     <span className="text-foreground font-medium">Future Credits:</span>{" "}

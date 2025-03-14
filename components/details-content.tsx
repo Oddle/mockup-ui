@@ -1,20 +1,13 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { useRouter, useSearchParams } from "next/navigation"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
 import {
   Select,
   SelectContent,
@@ -22,73 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { useState, useEffect } from "react"
 
 const countries = [
   { value: "sg", label: "Singapore" },
   { value: "us", label: "United States" },
   { value: "uk", label: "United Kingdom" },
   { value: "ca", label: "Canada" },
-]
-
-const existingAccounts = [
-  { 
-    value: "acc_01HNYP2K5RWJF8V9X6Q3M7B4ZD", 
-    label: "Jumbo Group", 
-    billing: { 
-      companyName: "Jumbo Group Holdings Pte Ltd",
-      regNumber: "199503898K",
-      billingEmail: "accounts@jumbogroup.sg",
-      address: "4 Kaki Bukit Ave 1",
-      country: "sg",
-      postal: "417939"
-    },
-    users: [
-      { 
-        id: "usr_01HNYP4M6TN8D2XJVK5RQWC3FB", 
-        name: "Angeline Tan", 
-        email: "angeline.tan@jumbogroup.sg", 
-        role: "Finance Director",
-        phone: "+6591234567"
-      },
-      { 
-        id: "usr_01HNYP6P7WM9E3YHUL4SQVN2GC", 
-        name: "Marcus Lee", 
-        email: "marcus.lee@jumbogroup.sg", 
-        role: "Operations Manager",
-        phone: "+6598765432"
-      }
-    ]
-  },
-  {
-    value: "acc_01HNYPB8X5KH7M4WVTQ2PJNR9E",
-    label: "Paradise Group",
-    billing: {
-      companyName: "Paradise Group Holdings Pte Ltd",
-      regNumber: "200307297Z",
-      billingEmail: "finance@paradisegroup.com",
-      address: "91 Defu Lane 10",
-      country: "sg",
-      postal: "539221"
-    },
-    users: [
-      {
-        id: "usr_01HNYPD9Y6LJ8N5XWUR3QKMS0F",
-        name: "Sarah Wong",
-        email: "sarah.wong@paradisegroup.com",
-        role: "Finance Manager",
-        phone: "+6590001111"
-      },
-      {
-        id: "usr_01HNYPF0Z7MK9P6YXVS4RLNT1G",
-        name: "David Lim",
-        email: "david.lim@paradisegroup.com",
-        role: "Regional Director",
-        phone: "+6592223333"
-      }
-    ]
-  }
 ]
 
 const formSchema = z.object({

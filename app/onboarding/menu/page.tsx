@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
-import { Loader2, FileSpreadsheet, FileText, Globe, PenLine } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { Loader2, FileText, Globe } from "lucide-react"
 import {
   Accordion,
   AccordionContent,
@@ -34,7 +34,10 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export default function MenuPage() {
+// Separate component that uses useSearchParams
+import { useSearchParams } from "next/navigation"
+
+function MenuForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const nextPage = searchParams.get("next") || "/onboarding/contact"
@@ -104,7 +107,7 @@ export default function MenuPage() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter your restaurant's URL from GrabFood, Foodpanda, or Deliveroo
+                          Enter your restaurant&apos;s URL from GrabFood, Foodpanda, or Deliveroo
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -154,7 +157,7 @@ export default function MenuPage() {
                   <FormField
                     control={form.control}
                     name="menuFile"
-                    render={({ field: { value, onChange, ...field } }) => (
+                    render={({ field: { onChange, ...field } }) => (
                       <FormItem>
                         <FormLabel>Upload Menu File</FormLabel>
                         <FormControl>
@@ -218,5 +221,22 @@ export default function MenuPage() {
         </Form>
       </CardContent>
     </Card>
+  )
+}
+
+// Main component with Suspense boundary
+export default function MenuPage() {
+  return (
+    <Suspense fallback={
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </CardContent>
+      </Card>
+    }>
+      <MenuForm />
+    </Suspense>
   )
 } 

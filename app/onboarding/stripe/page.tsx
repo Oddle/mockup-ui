@@ -74,7 +74,7 @@ export default function StripePage() {
           </div>
 
           <div className="space-y-2">
-            <h3 className="font-medium">What you'll need:</h3>
+            <h3 className="font-medium">What you&apos;ll need:</h3>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li>• Business registration details</li>
               <li>• Bank account information</li>
@@ -127,7 +127,7 @@ export default function StripePage() {
 
           <div className="bg-muted/50 p-4 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              By connecting a Stripe account, you agree to Stripe's Terms of Service and acknowledge that you will be redirected to Stripe to complete the setup.
+              By connecting a Stripe account, you agree to Stripe&apos;s Terms of Service and acknowledge that you will be redirected to Stripe to complete the setup.
             </p>
           </div>
         </div>

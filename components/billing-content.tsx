@@ -329,7 +329,7 @@ export default function BillingContent() {
 
               <div className="bg-muted/50 p-4 rounded-lg mt-4">
                 <p className="text-sm text-muted-foreground">
-                  By clicking "Submit", you agree to Oddle's Terms of Service. An invoice will then be sent to both the billing emails and you for payment to be made.
+                  By clicking &quot;Submit&quot;, you agree to Oddle&apos;s Terms of Service. An invoice will then be sent to both the billing emails and you for payment to be made.
                 </p>
               </div>
             </div>

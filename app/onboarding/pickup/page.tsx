@@ -1,12 +1,12 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Copy, Clock } from "lucide-react"
+import { Clock, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Form,
@@ -19,6 +19,7 @@ import {
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useSearchParams } from "next/navigation"
 
 const formSchema = z.object({
   pickupStartBuffer: z.number().min(0).default(30),
@@ -57,11 +58,12 @@ const mockStores = [
 
 // Helper function to parse time string to minutes
 function parseTimeToMinutes(timeStr: string): number {
-  let [timeComponent, period] = timeStr.trim().split(" ")
-  let [hourStr, minuteStr = "0"] = timeComponent.split(":")
+  const [timeComponent, periodStr] = timeStr.trim().split(" ")
+  const [hourStr, minuteStr = "0"] = timeComponent.split(":")
   let hour = parseInt(hourStr)
-  let minutes = parseInt(minuteStr)
+  const minutes = parseInt(minuteStr)
   
+  let period = periodStr
   if (!period) {
     period = hour < 12 ? "PM" : "AM"
   }
@@ -102,7 +104,8 @@ function formatTimePeriodsWithBuffer(periods: string, startBuffer: number, endBu
   }).join(", ")
 }
 
-export default function PickupPage() {
+// Separate component that uses useSearchParams
+function PickupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const hasDelivery = searchParams.has("delivery")
@@ -178,7 +181,7 @@ export default function PickupPage() {
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Set pickup windows relative to your stores' opening and closing times (e.g., 30 mins after open, 1 hour before close)
+                    Set pickup windows relative to your stores&apos; opening and closing times (e.g., 30 mins after open, 1 hour before close)
                   </p>
                 </div>
               </button>
@@ -318,10 +321,10 @@ export default function PickupPage() {
           ) : (
             <div className="space-y-6">
               <div className="rounded-lg border p-4 space-y-6">
-                {mockStores.map((store, storeIndex) => (
+                {mockStores.map((store) => (
                   <div key={store.id} className="space-y-4">
                     <h4 className="font-medium">{store.name}</h4>
-                    {Object.entries(weeklyHours).map(([day, hours], index) => (
+                    {Object.entries(weeklyHours).map(([day, hours]) => (
                       <div key={day} className="grid grid-cols-[auto,1fr,auto,1fr,auto] items-center gap-4">
                         <Checkbox
                           id={`${store.id}-${day}`}
@@ -350,28 +353,6 @@ export default function PickupPage() {
                           }))}
                           className="w-32"
                         />
-                        {index === 0 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => {
-                              const sourceHours = weeklyHours[day]
-                              setWeeklyHours(
-                                Object.keys(weeklyHours).reduce(
-                                  (acc, currentDay) => ({
-                                    ...acc,
-                                    [currentDay]: sourceHours
-                                  }),
-                                  {}
-                                )
-                              )
-                            }}
-                          >
-                            <Copy className="h-4 w-4" />
-                            Copy To All
-                          </Button>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -418,5 +399,22 @@ export default function PickupPage() {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+// Main component with Suspense boundary
+export default function PickupPage() {
+  return (
+    <Suspense fallback={
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </CardContent>
+      </Card>
+    }>
+      <PickupForm />
+    </Suspense>
   )
 } 

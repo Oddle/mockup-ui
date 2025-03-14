@@ -2,13 +2,24 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { useRouter } from "next/navigation"
+
+interface PricingDetails {
+  subscription?: string;
+  usageFees?: {
+    title: string;
+    items: string[];
+  };
+  paymentFees?: {
+    title: string;
+    items: string[];
+  };
+  commission?: string;
+  transaction?: string | string[];
+  bookingFees?: string[];
+  additionalFees?: string[];
+  addOns?: string[];
+}
 
 const products = [
   { 
@@ -138,7 +149,7 @@ export default function PricingPage() {
   // Calculate total setup fee
   const totalSetupFee = products.reduce((sum, product) => sum + product.setupFee, 0)
 
-  const renderPricingDetails = (details: any) => {
+  const renderPricingDetails = (details: PricingDetails) => {
     if (!details) return null
 
     return (

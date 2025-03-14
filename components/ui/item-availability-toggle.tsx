@@ -7,14 +7,12 @@ import { RadioGroup, RadioGroupItem } from "./radio-group";
 import { cn } from "@/lib/utils";
 
 interface ItemAvailabilityToggleProps {
-  itemName: string;
   defaultAvailable?: boolean;
   onAvailabilityChange?: (isAvailable: boolean, unavailabilityType?: "today" | "indefinite") => void;
   className?: string;
 }
 
 export function ItemAvailabilityToggle({
-  itemName,
   defaultAvailable = true,
   onAvailabilityChange,
   className,

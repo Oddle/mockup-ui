@@ -1,7 +1,6 @@
 "use client";
 
-import { ItemAvailabilityToggle } from "@/components/ui/item-availability-toggle";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -14,9 +13,9 @@ import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 
 export default function ItemAvailabilityDemo() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [pauseType, setPauseType] = useState<"today" | "indefinite">("today");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const handleAvailabilityChange = (
     itemName: string,
@@ -353,7 +352,7 @@ export default function ItemAvailabilityDemo() {
                   Available
                 </Badge>
               </div>
-              <Dialog>
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 px-3">
                     Edit

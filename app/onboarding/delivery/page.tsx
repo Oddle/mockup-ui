@@ -10,12 +10,10 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormDescription,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import { Info } from "lucide-react"
 
 const formSchema = z.object({

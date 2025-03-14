@@ -6,15 +6,8 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Copy, Clock } from "lucide-react"
+import { Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Form,
   FormControl,
@@ -64,11 +57,12 @@ const formSchema = z.object({
 
 // Helper function to parse time string to minutes
 function parseTimeToMinutes(timeStr: string): number {
-  let [timeComponent, period] = timeStr.trim().split(" ")
-  let [hourStr, minuteStr = "0"] = timeComponent.split(":")
+  const [timeComponent, periodStr] = timeStr.trim().split(" ")
+  const [hourStr, minuteStr = "0"] = timeComponent.split(":")
   let hour = parseInt(hourStr)
-  let minutes = parseInt(minuteStr)
+  const minutes = parseInt(minuteStr)
   
+  let period = periodStr
   if (!period) {
     period = hour < 12 ? "PM" : "AM"
   }
@@ -298,10 +292,10 @@ export default function PickupHoursPage() {
           ) : (
             <div className="space-y-6">
               <div className="rounded-lg border p-4 space-y-6">
-                {mockStores.map((store, storeIndex) => (
+                {mockStores.map((store) => (
                   <div key={store.id} className="space-y-4">
                     <h4 className="font-medium">{store.name}</h4>
-                    {Object.entries(weeklyHours).map(([day, hours], index) => (
+                    {Object.entries(weeklyHours).map(([day, hours]) => (
                       <div key={day} className="grid grid-cols-[auto,1fr,auto,1fr,auto] items-center gap-4">
                         <Checkbox
                           id={`${store.id}-${day}`}
@@ -330,28 +324,6 @@ export default function PickupHoursPage() {
                           }))}
                           className="w-32"
                         />
-                        {index === 0 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => {
-                              const sourceHours = weeklyHours[day]
-                              setWeeklyHours(
-                                Object.keys(weeklyHours).reduce(
-                                  (acc, currentDay) => ({
-                                    ...acc,
-                                    [currentDay]: sourceHours
-                                  }),
-                                  {}
-                                )
-                              )
-                            }}
-                          >
-                            <Copy className="h-4 w-4" />
-                            Copy To All
-                          </Button>
-                        )}
                       </div>
                     ))}
                   </div>

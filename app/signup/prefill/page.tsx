@@ -23,8 +23,10 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useState, useEffect, useCallback } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect, useCallback, Suspense } from "react"
+import { useRouter } from "next/navigation"
+import { Loader2 } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 
 const products = [
   { 
@@ -162,7 +164,7 @@ const formSchema = z.object({
   postal: z.string().optional(),
 })
 
-export default function SignUpPrefill() {
+function PrefillForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const accountId = searchParams.get('account_id')
@@ -186,12 +188,6 @@ export default function SignUpPrefill() {
   })
 
   // Use useWatch for form values that need to be watched
-  const selectedProducts = useWatch({
-    control: form.control,
-    name: "products",
-    defaultValue: []
-  }) as string[]
-
   const productFees = useWatch({
     control: form.control,
     name: "productFees",
@@ -234,7 +230,7 @@ export default function SignUpPrefill() {
     }
   }, [accountId, form])
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit() {
     try {
       // Add your API call here
       // await submitForm(values)
@@ -273,7 +269,8 @@ export default function SignUpPrefill() {
   const handleRemovePlanCode = useCallback((productId: string, commitmentFee: number) => {
     // Remove plan code
     const currentPlanCodes = form.getValues("productPlanCodes") || {}
-    const { [productId]: _, ...rest } = currentPlanCodes
+    const { [productId]: removed, ...rest } = currentPlanCodes
+    console.log(removed, rest)
     form.setValue("productPlanCodes", rest)
     
     // Reset to default fee
@@ -354,10 +351,10 @@ export default function SignUpPrefill() {
                                             <div className="flex items-start gap-4">
                                               <Checkbox
                                                 checked={field.value?.includes(product.id)}
-                                                onCheckedChange={(checked) => {
+                                                onCheckedChange={(checked: boolean) => {
                                                   const updatedProducts = checked
                                                     ? [...(field.value || []), product.id]
-                                                    : field.value?.filter((value) => value !== product.id)
+                                                    : field.value?.filter((value: string) => value !== product.id)
                                                   field.onChange(updatedProducts)
                                                   
                                                   if (checked) {
@@ -365,11 +362,13 @@ export default function SignUpPrefill() {
                                                   } else {
                                                     // Remove fees and plan codes when unchecking
                                                     const currentFees = form.getValues("productFees") || {}
-                                                    const { [product.id]: _, ...restFees } = currentFees
+                                                    const { [product.id]: removedFee, ...restFees } = currentFees
+                                                    console.log(removedFee, restFees)
                                                     form.setValue("productFees", restFees)
 
                                                     const currentPlanCodes = form.getValues("productPlanCodes") || {}
-                                                    const { [product.id]: __, ...restPlanCodes } = currentPlanCodes
+                                                    const { [product.id]: removedPlanCode, ...restPlanCodes } = currentPlanCodes
+                                                    console.log(removedPlanCode, restPlanCodes)
                                                     form.setValue("productPlanCodes", restPlanCodes)
                                                   }
                                                 }}
@@ -398,7 +397,7 @@ export default function SignUpPrefill() {
                                                   >
                                                     Remove
                                                   </Button>
-                                              </div>
+                                                </div>
                                               )}
                                             </div>
                                           </CardContent>
@@ -416,39 +415,12 @@ export default function SignUpPrefill() {
                             <CardContent className="p-4">
                               <h4 className="font-medium mb-4">Commitment Fees</h4>
                               <div className="space-y-3">
-                                {products
-                                  .filter(product => selectedProducts.includes(product.id))
-                                  .map((product) => (
-                                    <div key={product.id} className="flex justify-between items-center">
-                                      <div className="space-y-1">
-                                      <div className="font-medium">{product.label}</div>
-                                        {productPlanCodes[product.id] && (
-                                          <div className="text-sm text-muted-foreground">
-                                            Plan Code: {productPlanCodes[product.id]}
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm text-muted-foreground">$</span>
-                                                <Input
-                                                  type="number"
-                                                  className="w-24 text-right"
-                                          value={(productFees[product.id] || product.commitmentFee).toString()}
-                                                  onChange={(e) => {
-                                                    const value = parseFloat(e.target.value)
-                                                    if (!isNaN(value)) {
-                                              form.setValue(`productFees.${product.id}`, value)
-                                            }
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-                                  ))}
-                                {selectedProducts.length === 0 && (
-                                  <div className="text-sm text-muted-foreground text-center py-2">
-                                    Select products to see commitment fees
+                                {Object.entries(productFees).map(([productId, fee]) => (
+                                  <div key={productId} className="flex items-center justify-between">
+                                    <span className="text-sm">{products.find(p => p.id === productId)?.label}</span>
+                                    <span className="text-sm font-medium">${fee}</span>
                                   </div>
-                                )}
+                                ))}
                               </div>
                             </CardContent>
                           </Card>
@@ -927,5 +899,23 @@ export default function SignUpPrefill() {
         </form>
       </Form>
     </div>
+  )
+}
+
+export default function SignUpPrefill() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-[600px] mx-auto py-10 px-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-center h-[400px]">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <PrefillForm />
+    </Suspense>
   )
 } 
