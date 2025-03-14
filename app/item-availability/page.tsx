@@ -16,6 +16,7 @@ export default function ItemAvailabilityDemo() {
   const [isPaused, setIsPaused] = useState(false);
   const [pauseType, setPauseType] = useState<"today" | "indefinite">("today");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalStatus, setModalStatus] = useState<"available" | "today" | "indefinite" | "four_hours">("available");
   
   const handleAvailabilityChange = (
     itemName: string,
@@ -76,191 +77,86 @@ export default function ItemAvailabilityDemo() {
       </div>
 
       <div className="space-y-6">
-        {/* Option 1: Right-aligned Controls */}
+        {/* Modal Edit Pattern */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">1. Right-aligned Controls</h2>
+          <h2 className="text-lg font-semibold mb-3">1. Modal</h2>
+          <p className="text-sm text-muted-foreground mb-3">Inspired by Deliveroo's availability controls</p>
           <Card className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-medium">Chicken Rice</h3>
-                </div>
-                <div className="flex flex-col items-end gap-3">
-                  <Switch
-                    id="availability-toggle-1"
-                    checked={!isPaused}
-                    onCheckedChange={(checked) => {
-                      setIsPaused(!checked);
-                      if (!checked) {
-                        setPauseType("today");
-                        handleAvailabilityChange("Chicken Rice", false, "today");
-                      } else {
-                        handleAvailabilityChange("Chicken Rice", true);
-                      }
-                    }}
-                  />
-                  {isPaused && (
-                    <Badge 
-                      variant="outline"
-                      className="cursor-pointer active:bg-secondary/80 transition-colors flex items-center gap-1.5 py-1 px-3"
-                      onClick={togglePauseType}
-                    >
-                      {pauseType === "today" ? (
-                        <>
-                          <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                          <span>Back Tomorrow</span>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-2 h-2 rounded-full bg-red-500" />
-                          <span>Paused Indefinitely</span>
-                        </>
-                      )}
-                    </Badge>
-                  )}
-                </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h3 className="font-medium">Roti Prata</h3>
               </div>
-            </div>
-          </Card>
-        </section>
-
-        {/* Option 2: Button Style */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">2. Button Style</h2>
-          <Card className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">Chicken Rice</h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 text-xs"
-                  onClick={togglePauseType}
-                >
-                  {pauseType === "today" ? (
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                      Resumes Tomorrow
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      Paused
-                    </span>
-                  )}
-                </Button>
-              </div>
-              <Switch
-                id="availability-toggle-2"
-                checked={!isPaused}
-                onCheckedChange={(checked) => {
-                  setIsPaused(!checked);
-                  if (!checked) {
-                    setPauseType("today");
-                    handleAvailabilityChange("Chicken Rice", false, "today");
-                  } else {
-                    handleAvailabilityChange("Chicken Rice", true);
-                  }
-                }}
-              />
-            </div>
-          </Card>
-        </section>
-
-        {/* Option 3: Status Pill */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">3. Status Pill</h2>
-          <Card className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">Chicken Rice</h3>
-                {isPaused && (
-                  <div 
-                    className="rounded-full px-3 py-0.5 text-xs font-medium cursor-pointer active:opacity-80 transition-opacity flex items-center gap-1.5"
-                    onClick={togglePauseType}
-                    style={{
-                      backgroundColor: pauseType === "today" ? "rgb(253 224 71 / 0.2)" : "rgb(252 165 165 / 0.2)",
-                      color: pauseType === "today" ? "rgb(161 98 7)" : "rgb(153 27 27)"
-                    }}
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={cn(
+                      "h-8 px-3",
+                      "hover:bg-muted",
+                      "flex items-center gap-2"
+                    )}
                   >
-                    {pauseType === "today" ? "Back Tomorrow" : "Unavailable"}
-                  </div>
-                )}
-              </div>
-              <Switch
-                id="availability-toggle-3"
-                checked={!isPaused}
-                onCheckedChange={(checked) => {
-                  setIsPaused(!checked);
-                  if (!checked) {
-                    setPauseType("today");
-                    handleAvailabilityChange("Chicken Rice", false, "today");
-                  } else {
-                    handleAvailabilityChange("Chicken Rice", true);
-                  }
-                }}
-              />
-            </div>
-          </Card>
-        </section>
-
-        {/* Option 4: Two-State Toggle */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">4. Two-State Toggle</h2>
-          <Card className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">Chicken Rice</h3>
-                {isPaused && (
-                  <div className="flex rounded-md overflow-hidden text-xs border">
-                    <button
-                      className={cn(
-                        "px-2 py-1 transition-colors",
-                        pauseType === "today"
-                          ? "bg-yellow-50 text-yellow-700 border-r"
-                          : "bg-white text-muted-foreground hover:bg-muted"
-                      )}
-                      onClick={() => {
-                        if (pauseType !== "today") {
-                          setPauseType("today");
-                          handleAvailabilityChange("Chicken Rice", false, "today");
-                        }
-                      }}
+                    <div className={cn(
+                      "w-2 h-2 rounded-full",
+                      modalStatus === "available" && "bg-green-500",
+                      modalStatus === "today" && "bg-yellow-500",
+                      modalStatus === "four_hours" && "bg-yellow-500",
+                      modalStatus === "indefinite" && "bg-red-500"
+                    )} />
+                    <span>
+                      {modalStatus === "available" && "Available"}
+                      {modalStatus === "today" && "Out for Today"}
+                      {modalStatus === "four_hours" && "Out for 4 Hours"}
+                      {modalStatus === "indefinite" && "Off the menu"}
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <RadioGroup 
+                      value={modalStatus} 
+                      onValueChange={(value) => {
+                        setModalStatus(value as "available" | "today" | "indefinite" | "four_hours");
+                        setIsModalOpen(false);
+                      }} 
+                      className="space-y-2"
                     >
-                      Today
-                    </button>
-                    <button
-                      className={cn(
-                        "px-2 py-1 transition-colors",
-                        pauseType === "indefinite"
-                          ? "bg-red-50 text-red-700"
-                          : "bg-white text-muted-foreground hover:bg-muted"
-                      )}
-                      onClick={() => {
-                        if (pauseType !== "indefinite") {
-                          setPauseType("indefinite");
-                          handleAvailabilityChange("Chicken Rice", false, "indefinite");
-                        }
-                      }}
-                    >
-                      Indefinite
-                    </button>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="available" id="modal-available" />
+                        <Label htmlFor="modal-available" className="flex-1">
+                          <span className="font-medium">Available</span>
+                          <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="four_hours" id="modal-four-hours" />
+                        <Label htmlFor="modal-four-hours" className="flex-1">
+                          <span className="font-medium">Out for 4 Hours</span>
+                          <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="today" id="modal-today" />
+                        <Label htmlFor="modal-today" className="flex-1">
+                          <span className="font-medium">Out for Today</span>
+                          <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="indefinite" id="modal-indefinite" />
+                        <Label htmlFor="modal-indefinite" className="flex-1">
+                          <span className="font-medium">Off the menu</span>
+                          <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                        </Label>
+                      </div>
+                    </RadioGroup>
                   </div>
-                )}
-              </div>
-              <Switch
-                id="availability-toggle-4"
-                checked={!isPaused}
-                onCheckedChange={(checked) => {
-                  setIsPaused(!checked);
-                  if (!checked) {
-                    setPauseType("today");
-                    handleAvailabilityChange("Chicken Rice", false, "today");
-                  } else {
-                    handleAvailabilityChange("Chicken Rice", true);
-                  }
-                }}
-              />
+                </DialogContent>
+              </Dialog>
             </div>
           </Card>
         </section>
@@ -303,9 +199,189 @@ export default function ItemAvailabilityDemo() {
           </Card>
         </section>
 
+        {/* Option 1: Right-aligned Controls */}
+        <section>
+          <h2 className="text-lg font-semibold mb-3">3. Toggle Variations</h2>
+          
+          {/* Variation A: Inline with Description */}
+          <Card className="p-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h3 className="font-medium">Chicken Rice</h3>
+                {isPaused && (
+                  <div className="text-xs text-muted-foreground">
+                    {pauseType === "today" ? "Returns tomorrow" : "Removed from menu"}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                {isPaused && (
+                  <button
+                    onClick={togglePauseType}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {pauseType === "today" ? "Remove from menu" : "Set for today only"}
+                  </button>
+                )}
+                <Switch
+                  checked={!isPaused}
+                  onCheckedChange={(checked) => {
+                    setIsPaused(!checked);
+                    if (!checked) {
+                      setPauseType("today");
+                      handleAvailabilityChange("Chicken Rice", false, "today");
+                    } else {
+                      handleAvailabilityChange("Chicken Rice", true);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Variation B: Status Colors */}
+          <Card className="p-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className={cn(
+                  "w-2 h-2 rounded-full",
+                  !isPaused && "bg-green-500",
+                  isPaused && pauseType === "today" && "bg-yellow-500",
+                  isPaused && pauseType === "indefinite" && "bg-red-500"
+                )} />
+                <h3 className="font-medium">Chicken Rice</h3>
+              </div>
+              <div className="flex items-center gap-3">
+                {isPaused && (
+                  <select
+                    value={pauseType}
+                    onChange={(e) => {
+                      setPauseType(e.target.value as "today" | "indefinite");
+                      handleAvailabilityChange("Chicken Rice", false, e.target.value as "today" | "indefinite");
+                    }}
+                    className="text-xs border rounded px-2 py-1"
+                  >
+                    <option value="today">Out for today</option>
+                    <option value="indefinite">Off the menu</option>
+                  </select>
+                )}
+                <Switch
+                  checked={!isPaused}
+                  onCheckedChange={(checked) => {
+                    setIsPaused(!checked);
+                    if (!checked) {
+                      setPauseType("today");
+                      handleAvailabilityChange("Chicken Rice", false, "today");
+                    } else {
+                      handleAvailabilityChange("Chicken Rice", true);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Variation C: Compact Toggle Group */}
+          <Card className="p-4 mb-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Chicken Rice</h3>
+              <div className="flex items-center border rounded-lg overflow-hidden">
+                <button
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium transition-colors",
+                    !isPaused && "bg-primary text-primary-foreground",
+                    isPaused && "bg-background hover:bg-muted"
+                  )}
+                  onClick={() => {
+                    setIsPaused(false);
+                    handleAvailabilityChange("Chicken Rice", true);
+                  }}
+                >
+                  Available
+                </button>
+                <div className="w-px h-full bg-border" />
+                <button
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium transition-colors",
+                    isPaused && pauseType === "today" && "bg-yellow-50 text-yellow-700",
+                    !isPaused && "bg-background hover:bg-muted"
+                  )}
+                  onClick={() => {
+                    setIsPaused(true);
+                    setPauseType("today");
+                    handleAvailabilityChange("Chicken Rice", false, "today");
+                  }}
+                >
+                  Out for Today
+                </button>
+                <div className="w-px h-full bg-border" />
+                <button
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium transition-colors",
+                    isPaused && pauseType === "indefinite" && "bg-red-50 text-red-700",
+                    !isPaused && "bg-background hover:bg-muted"
+                  )}
+                  onClick={() => {
+                    setIsPaused(true);
+                    setPauseType("indefinite");
+                    handleAvailabilityChange("Chicken Rice", false, "indefinite");
+                  }}
+                >
+                  Off the menu
+                </button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Variation D: Minimal with Tooltip */}
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium">Chicken Rice</h3>
+                {isPaused && (
+                  <div 
+                    className={cn(
+                      "px-1.5 py-0.5 rounded text-xs font-medium",
+                      pauseType === "today" ? "bg-yellow-50 text-yellow-700" : "bg-red-50 text-red-700"
+                    )}
+                  >
+                    {pauseType === "today" ? "Out for today" : "Off the menu"}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={togglePauseType}
+                  className={cn(
+                    "rounded-full p-1.5 hover:bg-muted transition-colors",
+                    !isPaused && "text-muted-foreground"
+                  )}
+                  disabled={!isPaused}
+                >
+                  <svg width="14" height="14" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.5 7.5C1.5 4.18629 4.18629 1.5 7.5 1.5C10.8137 1.5 13.5 4.18629 13.5 7.5C13.5 10.8137 10.8137 13.5 7.5 13.5C4.18629 13.5 1.5 10.8137 1.5 7.5ZM7.5 2.5C4.73858 2.5 2.5 4.73858 2.5 7.5C2.5 10.2614 4.73858 12.5 7.5 12.5C10.2614 12.5 12.5 10.2614 12.5 7.5C12.5 4.73858 10.2614 2.5 7.5 2.5ZM7 8.5V4H8V8.5H7Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <Switch
+                  checked={!isPaused}
+                  onCheckedChange={(checked) => {
+                    setIsPaused(!checked);
+                    if (!checked) {
+                      setPauseType("today");
+                      handleAvailabilityChange("Chicken Rice", false, "today");
+                    } else {
+                      handleAvailabilityChange("Chicken Rice", true);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </Card>
+        </section>
+
         {/* Button Group Pattern - Mobile Optimized */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">3. Segmented Control</h2>
+          <h2 className="text-lg font-semibold mb-3">4. Segmented Control</h2>
           <Card className="p-4">
             <div className="mb-4">
               <h3 className="font-medium">Laksa</h3>
@@ -337,66 +413,6 @@ export default function ItemAvailabilityDemo() {
               >
                 Pause
               </Button>
-            </div>
-          </Card>
-        </section>
-
-        {/* Modal Edit Pattern */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">4. Modal Edit</h2>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h3 className="font-medium">Roti Prata</h3>
-                <Badge variant="secondary" className="text-xs">
-                  Available
-                </Badge>
-              </div>
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 px-3">
-                    Edit
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="flex items-center justify-between pb-4">
-                      <div>
-                        <Label htmlFor="modal-toggle">Item Status</Label>
-                        <p className="text-sm text-muted-foreground">Set item availability</p>
-                      </div>
-                      <Switch id="modal-toggle" defaultChecked />
-                    </div>
-                    <RadioGroup defaultValue="today" className="space-y-2">
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="today" id="modal-today" />
-                        <Label htmlFor="modal-today" className="flex-1">
-                          <span className="font-medium">Pause for Today</span>
-                          <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="indefinite" id="modal-indefinite" />
-                        <Label htmlFor="modal-indefinite" className="flex-1">
-                          <span className="font-medium">Pause Indefinitely</span>
-                          <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                    <div className="flex justify-end gap-2 pt-4">
-                      <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={() => setIsModalOpen(false)}>
-                        Save Changes
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
             </div>
           </Card>
         </section>

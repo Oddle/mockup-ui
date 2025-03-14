@@ -37,15 +37,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <main className="container max-w-[1200px] py-10">
+      <main className="w-auto py-10 px-6">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">UI Mockups Navigation</h1>
           <p className="text-slate-500">Select a section to view its mockup</p>
         </div>
         
-        <Card className="border-none shadow-lg">
+        <Card className="border-none shadow-lg w-fit mx-auto">
           <CardContent className="pt-8 pb-8">
-            <div className="flex flex-col items-center gap-4 max-w-xl mx-auto">
+            <div className="flex flex-col items-center gap-4">
               {mainPages.map((page) => {
                 const Icon = page.icon
                 return (
@@ -53,7 +53,7 @@ export default function Home() {
                     key={page.path}
                     variant="outline"
                     size="lg"
-                    className="w-full max-w-md h-24 text-lg relative group p-6 border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+                    className="w-[300px] h-24 text-lg relative group p-6 border-2 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
                     onClick={() => router.push(page.path)}
                   >
                     <div className="flex flex-col items-center text-center space-y-2">
