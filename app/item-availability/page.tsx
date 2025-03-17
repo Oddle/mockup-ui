@@ -17,6 +17,7 @@ export default function ItemAvailabilityDemo() {
   const [pauseType, setPauseType] = useState<"today" | "indefinite">("today");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState<"available" | "today" | "indefinite" | "four_hours">("available");
+  const [segmentedStatus, setSegmentedStatus] = useState<"available" | "today" | "indefinite">("available");
   
   const handleAvailabilityChange = (
     itemName: string,
@@ -107,7 +108,7 @@ export default function ItemAvailabilityDemo() {
                     <span>
                       {modalStatus === "available" && "Available"}
                       {modalStatus === "today" && "Out for Today"}
-                      {modalStatus === "four_hours" && "Out for 4 Hours"}
+                      {modalStatus === "four_hours" && `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}
                       {modalStatus === "indefinite" && "Off the menu"}
                     </span>
                   </Button>
@@ -176,21 +177,21 @@ export default function ItemAvailabilityDemo() {
                 </SelectTrigger>
                 <SelectContent align="end">
                   <SelectItem value="available">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
                       <span>Available</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="today">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                      <span>Paused Today</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                      <span>Out for Today</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="indefinite">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500" />
-                      <span>Paused</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-red-500" />
+                      <span>Off the menu</span>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -393,25 +394,33 @@ export default function ItemAvailabilityDemo() {
                 size="sm"
                 className={cn(
                   "h-9 rounded-md",
-                  "data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  segmentedStatus === "available" && "bg-background shadow-sm"
                 )}
-                data-state="active"
+                onClick={() => setSegmentedStatus("available")}
               >
                 Available
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 rounded-md"
+                className={cn(
+                  "h-9 rounded-md",
+                  segmentedStatus === "today" && "bg-background shadow-sm"
+                )}
+                onClick={() => setSegmentedStatus("today")}
               >
-                Pause Today
+                Out for Today
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 rounded-md"
+                className={cn(
+                  "h-9 rounded-md",
+                  segmentedStatus === "indefinite" && "bg-background shadow-sm"
+                )}
+                onClick={() => setSegmentedStatus("indefinite")}
               >
-                Pause
+                Off the menu
               </Button>
             </div>
           </Card>
