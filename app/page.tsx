@@ -3,12 +3,18 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
-import { KeyRound, UserPlus, ClipboardCheck, Calendar } from "lucide-react"
+import { KeyRound, UserPlus, ClipboardCheck, Calendar, ClipboardList } from "lucide-react"
 
 export default function Home() {
   const router = useRouter()
 
   const mainPages = [
+    { 
+      name: "Reservations", 
+      path: "/reservations",
+      description: "View and manage restaurant reservations",
+      icon: ClipboardList
+    },
     { 
       name: "Onboarding", 
       path: "/onboarding/password",
