@@ -13,6 +13,21 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Store } from "lucide-react";
+
+// Add types for items
+type Item = {
+  id: string;
+  name: string;
+  price: string;
+};
+
+// Mock data for items
+const items: Item[] = [
+  { id: "1", name: "Chicken Rice", price: "$4.50" },
+  { id: "2", name: "Laksa", price: "$5.50" },
+  { id: "3", name: "Nasi Lemak", price: "$4.00" },
+];
 
 export default function ItemAvailabilityDemo() {
   const [isPaused, setIsPaused] = useState(false);
@@ -22,7 +37,12 @@ export default function ItemAvailabilityDemo() {
   const [segmentedStatus, setSegmentedStatus] = useState<"available" | "today" | "indefinite">("available");
   const [selectedMethod, setSelectedMethod] = useState<"modal" | "dropdown" | "toggle" | "segmented">("modal");
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   
+  // Separate state for Variation 1
+  const [toggleByStoreModalOpen, setToggleByStoreModalOpen] = useState(false);
+  const [selectedItemForToggle, setSelectedItemForToggle] = useState<string | null>(null);
+
   const handleAvailabilityChange = (
     itemName: string,
     isAvailable: boolean,
@@ -51,6 +71,59 @@ export default function ItemAvailabilityDemo() {
       status: "Off the menu",
       lastUpdated: "3 days ago"
     }
+  };
+
+  // Add new types for store availability
+  type ItemStatus = "available" | "today" | "indefinite";
+  type StoreItemStatuses = Record<string, Record<string, ItemStatus>>;
+
+  // Mock data for stores
+  const stores = [
+    { id: "tampines", name: "Tampines Mall" },
+    { id: "jurong", name: "Jurong Point" },
+    { id: "nex", name: "NEX" },
+  ];
+
+  // Add new state for store availability
+  const [selectedStore, setSelectedStore] = useState(stores[0].id);
+  const [itemStatuses, setItemStatuses] = useState<StoreItemStatuses>({});
+  const [statusSelectionModalOpen, setStatusSelectionModalOpen] = useState(false);
+  const [selectedStoreForStatus, setSelectedStoreForStatus] = useState<string | null>(null);
+  const [selectedItemForStock, setSelectedItemForStock] = useState<string | null>(null);
+  const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+
+  // Add new functions for store availability
+  const handleStockChange = (storeId: string, itemId: string, status: ItemStatus) => {
+    setItemStatuses(prev => ({
+      ...prev,
+      [storeId]: {
+        ...(prev[storeId] || {}),
+        [itemId]: status
+      }
+    }));
+    setStatusSelectionModalOpen(false);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "available": return "bg-green-500";
+      case "today": return "bg-yellow-500";
+      case "indefinite": return "bg-red-500";
+      default: return "bg-gray-500";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "available": return "Available";
+      case "today": return "Out of Stock for Today";
+      case "indefinite": return "Off the Menu";
+      default: return "Set Status";
+    }
+  };
+
+  const getStoreItemStatus = (itemId: string, storeId: string): ItemStatus => {
+    return itemStatuses[storeId]?.[itemId] || "available";
   };
 
   return (
@@ -85,6 +158,21 @@ export default function ItemAvailabilityDemo() {
         </p>
       </div>
 
+      <div className="p-4 bg-muted rounded-lg text-sm mb-8">
+        <h2 className="font-semibold mb-3">Comparison with Current System</h2>
+        <ul className="space-y-2 text-muted-foreground">
+          <li>• <strong>Current:</strong> Simple on/off toggle without timeframe options</li>
+          <li>• <strong>New Patterns:</strong> Enhanced with:
+            <ul className="ml-4 mt-1 space-y-1">
+              <li>- Temporary pause (until tomorrow) or indefinite pause</li>
+              <li>- Clear visual feedback</li>
+              <li>- Mobile-optimized controls</li>
+              <li>- Prevents accidental state changes</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
       <Separator className="my-8" />
 
       <div className="mb-6">
@@ -100,96 +188,304 @@ export default function ItemAvailabilityDemo() {
       <div className="space-y-6">
         {/* Modal Edit Pattern */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">1. Android</h2>
+          <h2 className="text-lg font-semibold mb-3">Android</h2>
           <p className="text-sm text-muted-foreground mb-3">Similar to Deliveroo&apos;s availability controls</p>
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h3 className="font-medium">Roti Prata</h3>
               </div>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsStoreModalOpen(true)}
-                  className="h-8 px-3"
-                >
-                  Store Availability
-                </Button>
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className={cn(
-                        "h-8 px-3",
-                        "hover:bg-muted",
-                        "flex items-center gap-2"
-                      )}
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={cn(
+                      "h-8 px-3",
+                      "hover:bg-muted",
+                      "flex items-center gap-2"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-2 h-2 rounded-full",
+                      modalStatus === "available" && "bg-green-500",
+                      modalStatus === "today" && "bg-yellow-500",
+                      modalStatus === "four_hours" && "bg-yellow-500",
+                      modalStatus === "indefinite" && "bg-red-500"
+                    )} />
+                    <span>
+                      {modalStatus === "available" && "Available"}
+                      {modalStatus === "today" && "Out for Today"}
+                      {modalStatus === "four_hours" && `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}
+                      {modalStatus === "indefinite" && "Off the menu"}
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <RadioGroup 
+                      value={modalStatus} 
+                      onValueChange={(value) => {
+                        setModalStatus(value as "available" | "today" | "indefinite" | "four_hours");
+                        setIsModalOpen(false);
+                      }} 
+                      className="space-y-2"
                     >
-                      <div className={cn(
-                        "w-2 h-2 rounded-full",
-                        modalStatus === "available" && "bg-green-500",
-                        modalStatus === "today" && "bg-yellow-500",
-                        modalStatus === "four_hours" && "bg-yellow-500",
-                        modalStatus === "indefinite" && "bg-red-500"
-                      )} />
-                      <span>
-                        {modalStatus === "available" && "Available"}
-                        {modalStatus === "today" && "Out for Today"}
-                        {modalStatus === "four_hours" && `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}
-                        {modalStatus === "indefinite" && "Off the menu"}
-                      </span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <RadioGroup 
-                        value={modalStatus} 
-                        onValueChange={(value) => {
-                          setModalStatus(value as "available" | "today" | "indefinite" | "four_hours");
-                          setIsModalOpen(false);
-                        }} 
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="available" id="modal-available" />
-                          <Label htmlFor="modal-available" className="flex-1">
-                            <span className="font-medium">Available</span>
-                            <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="four_hours" id="modal-four-hours" />
-                          <Label htmlFor="modal-four-hours" className="flex-1">
-                            <span className="font-medium">Out for 4 Hours</span>
-                            <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="today" id="modal-today" />
-                          <Label htmlFor="modal-today" className="flex-1">
-                            <span className="font-medium">Out for Today</span>
-                            <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="indefinite" id="modal-indefinite" />
-                          <Label htmlFor="modal-indefinite" className="flex-1">
-                            <span className="font-medium">Off the menu</span>
-                            <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                          </Label>
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="available" id="modal-available" />
+                        <Label htmlFor="modal-available" className="flex-1">
+                          <span className="font-medium">Available</span>
+                          <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="four_hours" id="modal-four-hours" />
+                        <Label htmlFor="modal-four-hours" className="flex-1">
+                          <span className="font-medium">Out for 4 Hours</span>
+                          <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="today" id="modal-today" />
+                        <Label htmlFor="modal-today" className="flex-1">
+                          <span className="font-medium">Out for Today</span>
+                          <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-3 rounded-lg border p-3">
+                        <RadioGroupItem value="indefinite" id="modal-indefinite" />
+                        <Label htmlFor="modal-indefinite" className="flex-1">
+                          <span className="font-medium">Off the menu</span>
+                          <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </Card>
+        </section>
+
+        <Separator className="my-8" />
+
+        {/* Menu Management Section */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold">Menu Management</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Manage item availability across different stores
+              </p>
+            </div>
+            <Badge variant="outline" className="text-xs">New</Badge>
+          </div>
+
+          {/* Store-specific Availability Pattern */}
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-base font-medium mb-2">Variation 1: Toggle By Store</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Manage item availability for a specific store
+              </p>
+              <Card className="p-6">
+                <div className="mb-6">
+                  <Select value={selectedStore} onValueChange={setSelectedStore}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a store" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {stores.map((store) => (
+                        <SelectItem key={store.id} value={store.id}>
+                          {store.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <Card key={item.id} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-medium">{item.name}</h3>
+                          <p className="text-sm text-muted-foreground">{item.price}</p>
+                        </div>
+                        <Dialog open={toggleByStoreModalOpen && selectedItemForToggle === item.id} onOpenChange={setToggleByStoreModalOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => setSelectedItemForToggle(item.id)}
+                              className={cn(
+                                "h-8 px-3",
+                                "hover:bg-muted",
+                                "flex items-center gap-2"
+                              )}
+                            >
+                              <div className={cn(
+                                "w-2 h-2 rounded-full",
+                                getStatusColor(getStoreItemStatus(item.id, selectedStore))
+                              )} />
+                              <span>{getStatusText(getStoreItemStatus(item.id, selectedStore))}</span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit Availability - {item.name}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <RadioGroup 
+                                value={getStoreItemStatus(item.id, selectedStore)} 
+                                onValueChange={(value) => {
+                                  handleStockChange(selectedStore, item.id, value as ItemStatus);
+                                  setToggleByStoreModalOpen(false);
+                                }} 
+                                className="space-y-2"
+                              >
+                                <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                  <RadioGroupItem value="available" id={`${item.id}-available`} />
+                                  <Label htmlFor={`${item.id}-available`} className="flex-1">
+                                    <span className="font-medium">Available</span>
+                                    <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                  <RadioGroupItem value="today" id={`${item.id}-today`} />
+                                  <Label htmlFor={`${item.id}-today`} className="flex-1">
+                                    <span className="font-medium">Out of Stock for Today</span>
+                                    <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                  <RadioGroupItem value="indefinite" id={`${item.id}-indefinite`} />
+                                  <Label htmlFor={`${item.id}-indefinite`} className="flex-1">
+                                    <span className="font-medium">Off the Menu</span>
+                                    <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            <div>
+              <h3 className="text-base font-medium mb-2">Variation 2: Store Stock Availability</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                View and manage availability across all stores
+              </p>
+              <Card className="p-6">
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <Card key={item.id} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-medium">{item.name}</h3>
+                          <p className="text-sm text-muted-foreground">{item.price}</p>
+                        </div>
+                        <Dialog open={isStockModalOpen && selectedItemForStock === item.id} onOpenChange={setIsStockModalOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setSelectedItemForStock(item.id)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Store className="h-4 w-4" />
+                              <span className="sr-only">Store Availability</span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Store Availability - {item.name}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              {stores.map((store) => (
+                                <Card key={store.id} className="p-4">
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <h3 className="font-medium">{store.name}</h3>
+                                    </div>
+                                    <Dialog 
+                                      open={statusSelectionModalOpen && selectedStoreForStatus === store.id} 
+                                      onOpenChange={setStatusSelectionModalOpen}
+                                    >
+                                      <DialogTrigger asChild>
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm"
+                                          onClick={() => setSelectedStoreForStatus(store.id)}
+                                          className={cn(
+                                            "h-8 px-3",
+                                            "hover:bg-muted",
+                                            "flex items-center gap-2"
+                                          )}
+                                        >
+                                          <div className={cn(
+                                            "w-2 h-2 rounded-full",
+                                            getStatusColor(getStoreItemStatus(item.id, store.id))
+                                          )} />
+                                          <span>{getStatusText(getStoreItemStatus(item.id, store.id))}</span>
+                                        </Button>
+                                      </DialogTrigger>
+                                      <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                          <DialogTitle>Set Status - {store.name}</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4 py-4">
+                                          <RadioGroup 
+                                            value={getStoreItemStatus(item.id, store.id)} 
+                                            onValueChange={(value) => handleStockChange(store.id, item.id, value as ItemStatus)}
+                                            className="space-y-2"
+                                          >
+                                            <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                              <RadioGroupItem value="available" id={`${item.id}-${store.id}-available`} />
+                                              <Label htmlFor={`${item.id}-${store.id}-available`} className="flex-1">
+                                                <span className="font-medium">Available</span>
+                                                <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                                              </Label>
+                                            </div>
+                                            <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                              <RadioGroupItem value="today" id={`${item.id}-${store.id}-today`} />
+                                              <Label htmlFor={`${item.id}-${store.id}-today`} className="flex-1">
+                                                <span className="font-medium">Out of Stock for Today</span>
+                                                <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                                              </Label>
+                                            </div>
+                                            <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                              <RadioGroupItem value="indefinite" id={`${item.id}-${store.id}-indefinite`} />
+                                              <Label htmlFor={`${item.id}-${store.id}-indefinite`} className="flex-1">
+                                                <span className="font-medium">Off the Menu</span>
+                                                <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                                              </Label>
+                                            </div>
+                                          </RadioGroup>
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
+                                  </div>
+                                </Card>
+                              ))}
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </div>
         </section>
 
         <Accordion type="single" collapsible className="w-full">
@@ -537,21 +833,6 @@ export default function ItemAvailabilityDemo() {
               </div>
             </Card>
           </div>
-        </div>
-
-        <div className="mt-8 p-4 bg-muted rounded-lg text-sm">
-          <h2 className="font-semibold mb-3">Comparison with Current System</h2>
-          <ul className="space-y-2 text-muted-foreground">
-            <li>• <strong>Current:</strong> Simple on/off toggle without timeframe options</li>
-            <li>• <strong>New Patterns:</strong> Enhanced with:
-              <ul className="ml-4 mt-1 space-y-1">
-                <li>- Temporary pause (until tomorrow) or indefinite pause</li>
-                <li>- Clear visual feedback</li>
-                <li>- Mobile-optimized controls</li>
-                <li>- Prevents accidental state changes</li>
-              </ul>
-            </li>
-          </ul>
         </div>
       </div>
 
