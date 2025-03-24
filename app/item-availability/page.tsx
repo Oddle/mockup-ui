@@ -8,9 +8,11 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ItemAvailabilityDemo() {
   const [isPaused, setIsPaused] = useState(false);
@@ -18,6 +20,8 @@ export default function ItemAvailabilityDemo() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState<"available" | "today" | "indefinite" | "four_hours">("available");
   const [segmentedStatus, setSegmentedStatus] = useState<"available" | "today" | "indefinite">("available");
+  const [selectedMethod, setSelectedMethod] = useState<"modal" | "dropdown" | "toggle" | "segmented">("modal");
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   
   const handleAvailabilityChange = (
     itemName: string,
@@ -31,6 +35,22 @@ export default function ItemAvailabilityDemo() {
     const newPauseType = pauseType === "today" ? "indefinite" : "today";
     setPauseType(newPauseType);
     handleAvailabilityChange("Chicken Rice", false, newPauseType);
+  };
+
+  // Mock data for store availability
+  const storeAvailability = {
+    "Tampines Mall": {
+      status: "Out for Today",
+      lastUpdated: "2 hours ago"
+    },
+    "Jurong Point": {
+      status: "Available",
+      lastUpdated: "1 hour ago"
+    },
+    "NEX": {
+      status: "Off the menu",
+      lastUpdated: "3 days ago"
+    }
   };
 
   return (
@@ -69,7 +89,7 @@ export default function ItemAvailabilityDemo() {
 
       <div className="mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Proposed New Patterns</h2>
+          <h2 className="text-lg font-semibold">Merchant View</h2>
           <Badge variant="outline" className="text-xs">New</Badge>
         </div>
         <p className="text-sm text-muted-foreground mt-2">
@@ -80,351 +100,444 @@ export default function ItemAvailabilityDemo() {
       <div className="space-y-6">
         {/* Modal Edit Pattern */}
         <section>
-          <h2 className="text-lg font-semibold mb-3">1. Modal</h2>
+          <h2 className="text-lg font-semibold mb-3">1. Android</h2>
           <p className="text-sm text-muted-foreground mb-3">Similar to Deliveroo&apos;s availability controls</p>
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h3 className="font-medium">Roti Prata</h3>
               </div>
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className={cn(
-                      "h-8 px-3",
-                      "hover:bg-muted",
-                      "flex items-center gap-2"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-2 h-2 rounded-full",
-                      modalStatus === "available" && "bg-green-500",
-                      modalStatus === "today" && "bg-yellow-500",
-                      modalStatus === "four_hours" && "bg-yellow-500",
-                      modalStatus === "indefinite" && "bg-red-500"
-                    )} />
-                    <span>
-                      {modalStatus === "available" && "Available"}
-                      {modalStatus === "today" && "Out for Today"}
-                      {modalStatus === "four_hours" && `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}
-                      {modalStatus === "indefinite" && "Off the menu"}
-                    </span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <RadioGroup 
-                      value={modalStatus} 
-                      onValueChange={(value) => {
-                        setModalStatus(value as "available" | "today" | "indefinite" | "four_hours");
-                        setIsModalOpen(false);
-                      }} 
-                      className="space-y-2"
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIsStoreModalOpen(true)}
+                  className="h-8 px-3"
+                >
+                  Store Availability
+                </Button>
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className={cn(
+                        "h-8 px-3",
+                        "hover:bg-muted",
+                        "flex items-center gap-2"
+                      )}
                     >
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="available" id="modal-available" />
-                        <Label htmlFor="modal-available" className="flex-1">
-                          <span className="font-medium">Available</span>
-                          <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="four_hours" id="modal-four-hours" />
-                        <Label htmlFor="modal-four-hours" className="flex-1">
-                          <span className="font-medium">Out for 4 Hours</span>
-                          <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="today" id="modal-today" />
-                        <Label htmlFor="modal-today" className="flex-1">
-                          <span className="font-medium">Out for Today</span>
-                          <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="indefinite" id="modal-indefinite" />
-                        <Label htmlFor="modal-indefinite" className="flex-1">
-                          <span className="font-medium">Off the menu</span>
-                          <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </Card>
-        </section>
-
-        {/* Dropdown Pattern - Mobile Optimized */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">2. Inline Dropdown</h2>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">Nasi Lemak</h3>
-                <Badge variant="outline" className="text-xs">Popular</Badge>
-              </div>
-              <Select defaultValue="available">
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  <SelectItem value="available">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
-                      <span>Available</span>
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        modalStatus === "available" && "bg-green-500",
+                        modalStatus === "today" && "bg-yellow-500",
+                        modalStatus === "four_hours" && "bg-yellow-500",
+                        modalStatus === "indefinite" && "bg-red-500"
+                      )} />
+                      <span>
+                        {modalStatus === "available" && "Available"}
+                        {modalStatus === "today" && "Out for Today"}
+                        {modalStatus === "four_hours" && `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}
+                        {modalStatus === "indefinite" && "Off the menu"}
+                      </span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <RadioGroup 
+                        value={modalStatus} 
+                        onValueChange={(value) => {
+                          setModalStatus(value as "available" | "today" | "indefinite" | "four_hours");
+                          setIsModalOpen(false);
+                        }} 
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="available" id="modal-available" />
+                          <Label htmlFor="modal-available" className="flex-1">
+                            <span className="font-medium">Available</span>
+                            <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="four_hours" id="modal-four-hours" />
+                          <Label htmlFor="modal-four-hours" className="flex-1">
+                            <span className="font-medium">Out for 4 Hours</span>
+                            <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="today" id="modal-today" />
+                          <Label htmlFor="modal-today" className="flex-1">
+                            <span className="font-medium">Out for Today</span>
+                            <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="indefinite" id="modal-indefinite" />
+                          <Label htmlFor="modal-indefinite" className="flex-1">
+                            <span className="font-medium">Off the menu</span>
+                            <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                          </Label>
+                        </div>
+                      </RadioGroup>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="today">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                      <span>Out for Today</span>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="other-patterns">
+            <AccordionTrigger>Other Implementation Patterns</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-6">
+                {/* Dropdown Pattern - Mobile Optimized */}
+                <section>
+                  <h2 className="text-lg font-semibold mb-3">2. Inline Dropdown</h2>
+                  <Card className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium">Nasi Lemak</h3>
+                        <Badge variant="outline" className="text-xs">Popular</Badge>
+                      </div>
+                      <Select defaultValue="available">
+                        <SelectTrigger className="w-[140px]">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                          <SelectItem value="available">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-green-500" />
+                              <span>Available</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="today">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                              <span>Out for Today</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="indefinite">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-red-500" />
+                              <span>Off the menu</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="indefinite">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <span>Off the menu</span>
+                  </Card>
+                </section>
+
+                {/* Option 1: Right-aligned Controls */}
+                <section>
+                  <h2 className="text-lg font-semibold mb-3">3. Toggle Variations</h2>
+                  
+                  {/* Variation A: Inline with Description */}
+                  <Card className="p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-medium">Chicken Rice</h3>
+                        {isPaused && (
+                          <div className="text-xs text-muted-foreground">
+                            {pauseType === "today" ? "Returns tomorrow" : "Removed from menu"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {isPaused && (
+                          <button
+                            onClick={togglePauseType}
+                            className="text-xs text-primary hover:underline"
+                          >
+                            {pauseType === "today" ? "Remove from menu" : "Set for today only"}
+                          </button>
+                        )}
+                        <Switch
+                          checked={!isPaused}
+                          onCheckedChange={(checked) => {
+                            setIsPaused(!checked);
+                            if (!checked) {
+                              setPauseType("today");
+                              handleAvailabilityChange("Chicken Rice", false, "today");
+                            } else {
+                              handleAvailabilityChange("Chicken Rice", true);
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </Card>
-        </section>
+                  </Card>
 
-        {/* Option 1: Right-aligned Controls */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">3. Toggle Variations</h2>
-          
-          {/* Variation A: Inline with Description */}
-          <Card className="p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h3 className="font-medium">Chicken Rice</h3>
-                {isPaused && (
-                  <div className="text-xs text-muted-foreground">
-                    {pauseType === "today" ? "Returns tomorrow" : "Removed from menu"}
+                  {/* Variation B: Status Colors */}
+                  <Card className="p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "w-2 h-2 rounded-full",
+                          !isPaused && "bg-green-500",
+                          isPaused && pauseType === "today" && "bg-yellow-500",
+                          isPaused && pauseType === "indefinite" && "bg-red-500"
+                        )} />
+                        <h3 className="font-medium">Chicken Rice</h3>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {isPaused && (
+                          <select
+                            value={pauseType}
+                            onChange={(e) => {
+                              setPauseType(e.target.value as "today" | "indefinite");
+                              handleAvailabilityChange("Chicken Rice", false, e.target.value as "today" | "indefinite");
+                            }}
+                            className="text-xs border rounded px-2 py-1"
+                          >
+                            <option value="today">Out for today</option>
+                            <option value="indefinite">Off the menu</option>
+                          </select>
+                        )}
+                        <Switch
+                          checked={!isPaused}
+                          onCheckedChange={(checked) => {
+                            setIsPaused(!checked);
+                            if (!checked) {
+                              setPauseType("today");
+                              handleAvailabilityChange("Chicken Rice", false, "today");
+                            } else {
+                              handleAvailabilityChange("Chicken Rice", true);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Variation C: Compact Toggle Group */}
+                  <Card className="p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">Chicken Rice</h3>
+                      <div className="flex items-center border rounded-lg overflow-hidden">
+                        <button
+                          className={cn(
+                            "px-3 py-1.5 text-xs font-medium transition-colors",
+                            !isPaused && "bg-primary text-primary-foreground",
+                            isPaused && "bg-background hover:bg-muted"
+                          )}
+                          onClick={() => {
+                            setIsPaused(false);
+                            handleAvailabilityChange("Chicken Rice", true);
+                          }}
+                        >
+                          Available
+                        </button>
+                        <div className="w-px h-full bg-border" />
+                        <button
+                          className={cn(
+                            "px-3 py-1.5 text-xs font-medium transition-colors",
+                            isPaused && pauseType === "today" && "bg-yellow-50 text-yellow-700",
+                            !isPaused && "bg-background hover:bg-muted"
+                          )}
+                          onClick={() => {
+                            setIsPaused(true);
+                            setPauseType("today");
+                            handleAvailabilityChange("Chicken Rice", false, "today");
+                          }}
+                        >
+                          Out for Today
+                        </button>
+                        <div className="w-px h-full bg-border" />
+                        <button
+                          className={cn(
+                            "px-3 py-1.5 text-xs font-medium transition-colors",
+                            isPaused && pauseType === "indefinite" && "bg-red-50 text-red-700",
+                            !isPaused && "bg-background hover:bg-muted"
+                          )}
+                          onClick={() => {
+                            setIsPaused(true);
+                            setPauseType("indefinite");
+                            handleAvailabilityChange("Chicken Rice", false, "indefinite");
+                          }}
+                        >
+                          Off the menu
+                        </button>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Variation D: Minimal with Tooltip */}
+                  <Card className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium">Chicken Rice</h3>
+                        {isPaused && (
+                          <div 
+                            className={cn(
+                              "px-1.5 py-0.5 rounded text-xs font-medium",
+                              pauseType === "today" ? "bg-yellow-50 text-yellow-700" : "bg-red-50 text-red-700"
+                            )}
+                          >
+                            {pauseType === "today" ? "Out for today" : "Off the menu"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={togglePauseType}
+                          className={cn(
+                            "rounded-full p-1.5 hover:bg-muted transition-colors",
+                            !isPaused && "text-muted-foreground"
+                          )}
+                          disabled={!isPaused}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1.5 7.5C1.5 4.18629 4.18629 1.5 7.5 1.5C10.8137 1.5 13.5 4.18629 13.5 7.5C13.5 10.8137 10.8137 13.5 7.5 13.5C4.18629 13.5 1.5 10.8137 1.5 7.5ZM7.5 2.5C4.73858 2.5 2.5 4.73858 2.5 7.5C2.5 10.2614 4.73858 12.5 7.5 12.5C10.2614 12.5 12.5 10.2614 12.5 7.5C12.5 4.73858 10.2614 2.5 7.5 2.5ZM7 8.5V4H8V8.5H7Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                        <Switch
+                          checked={!isPaused}
+                          onCheckedChange={(checked) => {
+                            setIsPaused(!checked);
+                            if (!checked) {
+                              setPauseType("today");
+                              handleAvailabilityChange("Chicken Rice", false, "today");
+                            } else {
+                              handleAvailabilityChange("Chicken Rice", true);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                </section>
+
+                {/* Button Group Pattern - Mobile Optimized */}
+                <section>
+                  <h2 className="text-lg font-semibold mb-3">4. Segmented Control</h2>
+                  <Card className="p-4">
+                    <div className="mb-4">
+                      <h3 className="font-medium">Laksa</h3>
+                      <p className="text-sm text-muted-foreground">Special of the day</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1 bg-muted p-1 rounded-lg">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-9 rounded-md",
+                          segmentedStatus === "available" && "bg-background shadow-sm"
+                        )}
+                        onClick={() => setSegmentedStatus("available")}
+                      >
+                        Available
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-9 rounded-md",
+                          segmentedStatus === "today" && "bg-background shadow-sm"
+                        )}
+                        onClick={() => setSegmentedStatus("today")}
+                      >
+                        Out for Today
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "h-9 rounded-md",
+                          segmentedStatus === "indefinite" && "bg-background shadow-sm"
+                        )}
+                        onClick={() => setSegmentedStatus("indefinite")}
+                      >
+                        Off the menu
+                      </Button>
+                    </div>
+                  </Card>
+                </section>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        <Separator className="my-8" />
+
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Shop View</h2>
+            <Badge variant="outline" className="text-xs">Preview</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            How items appear to customers based on availability status
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {/* Available Item */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Available Item Preview</h3>
+            <Card className="p-4">
+              <div className="flex gap-4">
+                <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
+                  Image
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-medium">阿元香草鸡 | Ah Yuan Fragrant Herbal Chicken</h3>
                   </div>
-                )}
+                  <p className="text-sm text-muted-foreground mb-2">松软入味，卤香浓郁 Soft and sumptuously tasty.</p>
+                  <p className="font-medium">$14.00</p>
+                  <Button size="sm" className="mt-2">Add</Button>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                {isPaused && (
-                  <button
-                    onClick={togglePauseType}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    {pauseType === "today" ? "Remove from menu" : "Set for today only"}
-                  </button>
-                )}
-                <Switch
-                  checked={!isPaused}
-                  onCheckedChange={(checked) => {
-                    setIsPaused(!checked);
-                    if (!checked) {
-                      setPauseType("today");
-                      handleAvailabilityChange("Chicken Rice", false, "today");
-                    } else {
-                      handleAvailabilityChange("Chicken Rice", true);
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
 
-          {/* Variation B: Status Colors */}
-          <Card className="p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className={cn(
-                  "w-2 h-2 rounded-full",
-                  !isPaused && "bg-green-500",
-                  isPaused && pauseType === "today" && "bg-yellow-500",
-                  isPaused && pauseType === "indefinite" && "bg-red-500"
-                )} />
-                <h3 className="font-medium">Chicken Rice</h3>
-              </div>
-              <div className="flex items-center gap-3">
-                {isPaused && (
-                  <select
-                    value={pauseType}
-                    onChange={(e) => {
-                      setPauseType(e.target.value as "today" | "indefinite");
-                      handleAvailabilityChange("Chicken Rice", false, e.target.value as "today" | "indefinite");
-                    }}
-                    className="text-xs border rounded px-2 py-1"
-                  >
-                    <option value="today">Out for today</option>
-                    <option value="indefinite">Off the menu</option>
-                  </select>
-                )}
-                <Switch
-                  checked={!isPaused}
-                  onCheckedChange={(checked) => {
-                    setIsPaused(!checked);
-                    if (!checked) {
-                      setPauseType("today");
-                      handleAvailabilityChange("Chicken Rice", false, "today");
-                    } else {
-                      handleAvailabilityChange("Chicken Rice", true);
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </Card>
-
-          {/* Variation C: Compact Toggle Group */}
-          <Card className="p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium">Chicken Rice</h3>
-              <div className="flex items-center border rounded-lg overflow-hidden">
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-xs font-medium transition-colors",
-                    !isPaused && "bg-primary text-primary-foreground",
-                    isPaused && "bg-background hover:bg-muted"
-                  )}
-                  onClick={() => {
-                    setIsPaused(false);
-                    handleAvailabilityChange("Chicken Rice", true);
-                  }}
-                >
-                  Available
-                </button>
-                <div className="w-px h-full bg-border" />
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-xs font-medium transition-colors",
-                    isPaused && pauseType === "today" && "bg-yellow-50 text-yellow-700",
-                    !isPaused && "bg-background hover:bg-muted"
-                  )}
-                  onClick={() => {
-                    setIsPaused(true);
-                    setPauseType("today");
-                    handleAvailabilityChange("Chicken Rice", false, "today");
-                  }}
-                >
-                  Out for Today
-                </button>
-                <div className="w-px h-full bg-border" />
-                <button
-                  className={cn(
-                    "px-3 py-1.5 text-xs font-medium transition-colors",
-                    isPaused && pauseType === "indefinite" && "bg-red-50 text-red-700",
-                    !isPaused && "bg-background hover:bg-muted"
-                  )}
-                  onClick={() => {
-                    setIsPaused(true);
-                    setPauseType("indefinite");
-                    handleAvailabilityChange("Chicken Rice", false, "indefinite");
-                  }}
-                >
-                  Off the menu
-                </button>
-              </div>
-            </div>
-          </Card>
-
-          {/* Variation D: Minimal with Tooltip */}
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="font-medium">Chicken Rice</h3>
-                {isPaused && (
-                  <div 
-                    className={cn(
-                      "px-1.5 py-0.5 rounded text-xs font-medium",
-                      pauseType === "today" ? "bg-yellow-50 text-yellow-700" : "bg-red-50 text-red-700"
-                    )}
-                  >
-                    {pauseType === "today" ? "Out for today" : "Off the menu"}
+          {/* Out for Today Item */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Out for Today Preview</h3>
+            <Card className="p-4">
+              <div className="flex gap-4">
+                <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
+                  Image
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-medium">咖喱鸡 | Curry Chicken</h3>
                   </div>
-                )}
+                  <p className="text-sm text-muted-foreground mb-2">浓郁香料，温和可口 Rich spices, mild and delicious.</p>
+                  <p className="font-medium">$12.00</p>
+                  <Button size="sm" className="mt-2" disabled>Out of Stock Today</Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={togglePauseType}
-                  className={cn(
-                    "rounded-full p-1.5 hover:bg-muted transition-colors",
-                    !isPaused && "text-muted-foreground"
-                  )}
-                  disabled={!isPaused}
-                >
-                  <svg width="14" height="14" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.5 7.5C1.5 4.18629 4.18629 1.5 7.5 1.5C10.8137 1.5 13.5 4.18629 13.5 7.5C13.5 10.8137 10.8137 13.5 7.5 13.5C4.18629 13.5 1.5 10.8137 1.5 7.5ZM7.5 2.5C4.73858 2.5 2.5 4.73858 2.5 7.5C2.5 10.2614 4.73858 12.5 7.5 12.5C10.2614 12.5 12.5 10.2614 12.5 7.5C12.5 4.73858 10.2614 2.5 7.5 2.5ZM7 8.5V4H8V8.5H7Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd" />
-                  </svg>
-                </button>
-                <Switch
-                  checked={!isPaused}
-                  onCheckedChange={(checked) => {
-                    setIsPaused(!checked);
-                    if (!checked) {
-                      setPauseType("today");
-                      handleAvailabilityChange("Chicken Rice", false, "today");
-                    } else {
-                      handleAvailabilityChange("Chicken Rice", true);
-                    }
-                  }}
-                />
-              </div>
-            </div>
-          </Card>
-        </section>
+            </Card>
+          </div>
 
-        {/* Button Group Pattern - Mobile Optimized */}
-        <section>
-          <h2 className="text-lg font-semibold mb-3">4. Segmented Control</h2>
-          <Card className="p-4">
-            <div className="mb-4">
-              <h3 className="font-medium">Laksa</h3>
-              <p className="text-sm text-muted-foreground">Special of the day</p>
-            </div>
-            <div className="grid grid-cols-3 gap-1 bg-muted p-1 rounded-lg">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "h-9 rounded-md",
-                  segmentedStatus === "available" && "bg-background shadow-sm"
-                )}
-                onClick={() => setSegmentedStatus("available")}
-              >
-                Available
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "h-9 rounded-md",
-                  segmentedStatus === "today" && "bg-background shadow-sm"
-                )}
-                onClick={() => setSegmentedStatus("today")}
-              >
-                Out for Today
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "h-9 rounded-md",
-                  segmentedStatus === "indefinite" && "bg-background shadow-sm"
-                )}
-                onClick={() => setSegmentedStatus("indefinite")}
-              >
-                Off the menu
-              </Button>
-            </div>
-          </Card>
-        </section>
+          {/* Off the Menu Item */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Off the Menu Preview</h3>
+            <Card className="p-4">
+              <div className="flex gap-4">
+                <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
+                  Image
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-medium">炸鸡翅 | Fried Chicken Wings</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">外酥内嫩，风味十足 Crispy outside, tender inside.</p>
+                  <p className="font-medium">$10.00</p>
+                  <Button size="sm" className="mt-2" disabled>Out of Stock</Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
 
         <div className="mt-8 p-4 bg-muted rounded-lg text-sm">
           <h2 className="font-semibold mb-3">Comparison with Current System</h2>
@@ -441,6 +554,46 @@ export default function ItemAvailabilityDemo() {
           </ul>
         </div>
       </div>
+
+      {/* Store Availability Modal */}
+      <Dialog open={isStoreModalOpen} onOpenChange={setIsStoreModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Store Availability - Roti Prata</DialogTitle>
+          </DialogHeader>
+          <Tabs defaultValue="Tampines Mall" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              {Object.keys(storeAvailability).map((store) => (
+                <TabsTrigger key={store} value={store}>
+                  {store}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {Object.entries(storeAvailability).map(([store, data]) => (
+              <TabsContent key={store} value={store}>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        data.status === "Available" && "bg-green-500",
+                        data.status === "Out for Today" && "bg-yellow-500",
+                        data.status === "Off the menu" && "bg-red-500"
+                      )} />
+                      <span className="font-medium">{data.status}</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">Updated {data.lastUpdated}</span>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm">Edit</Button>
+                    <Button size="sm">Save Changes</Button>
+                  </div>
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

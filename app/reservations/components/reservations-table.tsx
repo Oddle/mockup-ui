@@ -15,7 +15,7 @@ import { ReservationDetailsModal } from "./reservation-details-modal"
 
 export type Reservation = {
   id: string
-  status: 'COMPLETED'
+  status: 'COMPLETED' | 'PENDING_PAYMENT' | 'CANCELLED'
   date: string
   customer: {
     name: string
@@ -25,11 +25,17 @@ export type Reservation = {
   ticket: {
     type: string
     amount: number
-    paymentType: 'Prepaid' | 'Manual' | 'Deposit' | 'Card Guarantee'
+    paymentType: 'Prepaid' | 'Manual' | 'Deposit' | 'Card Guarantee' | 'Bank Transfer'
   }
-  paymentStatus: 'Paid' | 'Guaranteed'
+  paymentStatus: 'Paid' | 'Guaranteed' | 'Pending Bank Transfer'
   paymentDate: string
   canRefund: boolean
+  bankTransfer?: {
+    accountName: string
+    accountNumber: string
+    bankName: string
+    reference: string
+  }
 }
 
 const mockData: Reservation[] = [
@@ -176,6 +182,30 @@ const mockData: Reservation[] = [
     paymentStatus: 'Guaranteed',
     paymentDate: '1 Oct 2024',
     canRefund: false
+  },
+  {
+    id: 'BT123456',
+    status: 'PENDING_PAYMENT',
+    date: '15 Oct 2024, 07:00 PM',
+    customer: {
+      name: 'Kate Ong',
+      phone: '+6596414209',
+      email: 'kate.ong*5@oddle.me'
+    },
+    ticket: {
+      type: 'Ramen Festival',
+      amount: 88.88,
+      paymentType: 'Bank Transfer'
+    },
+    paymentStatus: 'Pending Bank Transfer',
+    paymentDate: '14 Oct 2024',
+    canRefund: false,
+    bankTransfer: {
+      accountName: 'RESTAURANT PTE LTD',
+      accountNumber: '123-456-789-0',
+      bankName: 'DBS Bank',
+      reference: 'BT123456'
+    }
   }
 ]
 
@@ -204,7 +234,9 @@ export function ReservationsTable() {
               >
                 <TableCell>
                   <div className="flex flex-col gap-1">
-                    <Badge variant="secondary">COMPLETED</Badge>
+                    <Badge variant={reservation.status === 'PENDING_PAYMENT' ? 'outline' : 'secondary'}>
+                      {reservation.status}
+                    </Badge>
                     <span className="text-sm text-gray-500">{reservation.date}</span>
                     <span className="text-xs text-gray-400">#{reservation.id}</span>
                   </div>
@@ -225,7 +257,16 @@ export function ReservationsTable() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  <Badge 
+                    variant="secondary" 
+                    className={
+                      reservation.paymentStatus === 'Paid' 
+                        ? 'bg-green-100 text-green-800' 
+                        : reservation.paymentStatus === 'Pending Bank Transfer'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : ''
+                    }
+                  >
                     {reservation.paymentStatus}
                   </Badge>
                   <div className="text-sm text-gray-500 mt-1">
@@ -246,7 +287,9 @@ export function ReservationsTable() {
                     </Button>
                   ) : (
                     <span className="text-sm text-gray-500">
-                      Unable to refund as it was a manual payment
+                      {reservation.ticket.paymentType === 'Bank Transfer' 
+                        ? 'Refunds must be processed offline'
+                        : 'Unable to refund as it was a manual payment'}
                     </span>
                   )}
                 </TableCell>

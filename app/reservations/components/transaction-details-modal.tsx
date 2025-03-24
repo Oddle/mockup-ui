@@ -3,7 +3,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
+import { X, Copy } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import type { Reservation } from "./reservations-table"
 
@@ -19,6 +19,10 @@ export function TransactionDetailsModal({
   onOpenChange
 }: TransactionDetailsModalProps) {
   if (!reservation) return null
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,25 +40,96 @@ export function TransactionDetailsModal({
             <div className="grid grid-cols-3 gap-6">
               <div>
                 <h4 className="text-xs text-gray-500 font-medium mb-1">PAYMENT STATUS</h4>
-                <Badge variant="outline" className="bg-green-50 text-green-700">Paid</Badge>
+                <Badge 
+                  variant="outline" 
+                  className={
+                    reservation.paymentStatus === 'Paid' 
+                      ? 'bg-green-50 text-green-700'
+                      : reservation.paymentStatus === 'Pending Bank Transfer'
+                      ? 'bg-yellow-50 text-yellow-700'
+                      : ''
+                  }
+                >
+                  {reservation.paymentStatus}
+                </Badge>
               </div>
               <div>
                 <h4 className="text-xs text-gray-500 font-medium mb-1">TRANSACTION ID</h4>
-                <p>RES-22414694-DEP</p>
+                <p>{reservation.id}</p>
               </div>
               <div>
                 <h4 className="text-xs text-gray-500 font-medium mb-1">PAYMENT VIA</h4>
-                <Badge variant="outline" className="bg-teal-50 text-teal-700">Manual Payment</Badge>
+                <Badge variant="outline" className="bg-teal-50 text-teal-700">{reservation.ticket.paymentType}</Badge>
               </div>
               <div>
                 <h4 className="text-xs text-gray-500 font-medium mb-1">AMOUNT PAID</h4>
-                <p>S$70</p>
+                <p>S${reservation.ticket.amount.toFixed(2)}</p>
               </div>
               <div>
                 <h4 className="text-xs text-gray-500 font-medium mb-1">DATE AND TIME PAID</h4>
-                <p>01 Oct 2024, 05:33 PM</p>
+                <p>{reservation.paymentDate}</p>
               </div>
             </div>
+
+            {/* Bank Transfer Details */}
+            {reservation.ticket.paymentType === 'Bank Transfer' && (
+              <>
+                <div className="h-px bg-gray-200 my-6" />
+                <div>
+                  <h3 className="font-medium mb-4">Bank Transfer Details</h3>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-xs text-gray-500 font-medium mb-1">BANK NAME</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm">{reservation.bankTransfer?.bankName}</p>
+                        <button 
+                          onClick={() => copyToClipboard(reservation.bankTransfer?.bankName || '')}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs text-gray-500 font-medium mb-1">ACCOUNT NAME</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm">{reservation.bankTransfer?.accountName}</p>
+                        <button 
+                          onClick={() => copyToClipboard(reservation.bankTransfer?.accountName || '')}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs text-gray-500 font-medium mb-1">ACCOUNT NUMBER</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm">{reservation.bankTransfer?.accountNumber}</p>
+                        <button 
+                          onClick={() => copyToClipboard(reservation.bankTransfer?.accountNumber || '')}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-xs text-gray-500 font-medium mb-1">PAYMENT REFERENCE</h4>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm">{reservation.bankTransfer?.reference}</p>
+                        <button 
+                          onClick={() => copyToClipboard(reservation.bankTransfer?.reference || '')}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Two Column Layout */}
@@ -68,19 +143,21 @@ export function TransactionDetailsModal({
               <div className="flex items-start gap-2 mb-6">
                 <span className="w-2 h-2 mt-2 rounded-full bg-red-500" />
                 <div>
-                  <p className="font-medium">Patio Reservation</p>
-                  <p className="text-sm text-gray-500">S$10 Deposit</p>
+                  <p className="font-medium">{reservation.ticket.type}</p>
+                  <p className="text-sm text-gray-500">
+                    S${reservation.ticket.amount.toFixed(2)} {reservation.ticket.paymentType}
+                  </p>
                 </div>
               </div>
               <div className="border rounded-md p-4">
                 <div className="grid grid-cols-4 gap-6">
                   <div>
                     <h4 className="text-xs text-gray-500 font-medium mb-2">STATUS</h4>
-                    <Badge variant="secondary" className="text-xs">COMPLETED</Badge>
+                    <Badge variant="secondary" className="text-xs">{reservation.status}</Badge>
                   </div>
                   <div>
                     <h4 className="text-xs text-gray-500 font-medium mb-2">DATE AND TIME</h4>
-                    <p className="text-sm">01 Oct 2024, 06:00 PM</p>
+                    <p className="text-sm">{reservation.date}</p>
                   </div>
                   <div>
                     <h4 className="text-xs text-gray-500 font-medium mb-2">PAX</h4>
