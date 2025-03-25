@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Store, Calendar } from "lucide-react";
+import { Store } from "lucide-react";
 
 // Add types for items
 type Item = {
