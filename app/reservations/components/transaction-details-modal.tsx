@@ -2,7 +2,6 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { X, Copy } from "lucide-react"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import type { Reservation } from "./reservations-table"

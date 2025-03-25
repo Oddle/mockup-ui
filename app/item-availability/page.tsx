@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Store } from "lucide-react";
+import { Store, Calendar } from "lucide-react";
 
 // Add types for items
 type Item = {
@@ -29,16 +29,21 @@ const items: Item[] = [
   { id: "3", name: "Nasi Lemak", price: "$4.00" },
 ];
 
+// Add types for availability
+type AvailabilityStatus = "available" | "out_for_today" | "off_menu" | "out_for_four_hours";
+type DateKey = "today" | "today_4hours" | "today_5hours" | "tomorrow" | "next_week";
+type ItemAvailability = Record<string, AvailabilityStatus>;
+type ItemAvailabilityByDate = Record<DateKey, ItemAvailability>;
+
 export default function ItemAvailabilityDemo() {
   const [isPaused, setIsPaused] = useState(false);
   const [pauseType, setPauseType] = useState<"today" | "indefinite">("today");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState<"available" | "today" | "indefinite" | "four_hours">("available");
   const [segmentedStatus, setSegmentedStatus] = useState<"available" | "today" | "indefinite">("available");
-  const [selectedMethod, setSelectedMethod] = useState<"modal" | "dropdown" | "toggle" | "segmented">("modal");
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  
+  const [selectedDate, setSelectedDate] = useState<DateKey>("today");
+
   // Separate state for Variation 1
   const [toggleByStoreModalOpen, setToggleByStoreModalOpen] = useState(false);
   const [selectedItemForToggle, setSelectedItemForToggle] = useState<string | null>(null);
@@ -124,6 +129,54 @@ export default function ItemAvailabilityDemo() {
 
   const getStoreItemStatus = (itemId: string, storeId: string): ItemStatus => {
     return itemStatuses[storeId]?.[itemId] || "available";
+  };
+
+  // Mock data for item availability by date
+  const itemAvailabilityByDate: ItemAvailabilityByDate = {
+    today: {
+      "阿元香草鸡": "available",
+      "咖喱鸡": "out_for_today",
+      "沙爹": "out_for_four_hours",
+      "炸鸡翅": "off_menu"
+    },
+    today_4hours: {
+      "阿元香草鸡": "available",
+      "咖喱鸡": "out_for_today",
+      "沙爹": "out_for_today",
+      "炸鸡翅": "off_menu"
+    },
+    today_5hours: {
+      "阿元香草鸡": "available",
+      "咖喱鸡": "out_for_today",
+      "沙爹": "available",
+      "炸鸡翅": "off_menu"
+    },
+    tomorrow: {
+      "阿元香草鸡": "available",
+      "咖喱鸡": "available",
+      "沙爹": "available",
+      "炸鸡翅": "off_menu"
+    },
+    next_week: {
+      "阿元香草鸡": "available",
+      "咖喱鸡": "available",
+      "沙爹": "available",
+      "炸鸡翅": "off_menu"
+    }
+  };
+
+  // Add state for managing item availability
+  const [itemAvailability, setItemAvailability] = useState(itemAvailabilityByDate);
+
+  // Function to update item availability
+  const updateItemAvailability = (date: DateKey, itemName: string, status: AvailabilityStatus) => {
+    setItemAvailability(prev => ({
+      ...prev,
+      [date]: {
+        ...prev[date],
+        [itemName]: status
+      }
+    }));
   };
 
   return (
@@ -763,77 +816,124 @@ export default function ItemAvailabilityDemo() {
 
         <Separator className="my-8" />
 
-        <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Shop View</h2>
-            <Badge variant="outline" className="text-xs">Preview</Badge>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold">Shop View</h2>
+            <p className="text-gray-500">View and manage item availability for a specific date</p>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            How items appear to customers based on availability status
-          </p>
+          <Badge variant="outline" className="h-7">New</Badge>
         </div>
-
-        <div className="space-y-4">
-          {/* Available Item */}
-          <div>
-            <h3 className="text-sm font-medium mb-2">Available Item Preview</h3>
-            <Card className="p-4">
-              <div className="flex gap-4">
-                <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
-                  Image
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-medium">阿元香草鸡 | Ah Yuan Fragrant Herbal Chicken</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">松软入味，卤香浓郁 Soft and sumptuously tasty.</p>
-                  <p className="font-medium">$14.00</p>
-                  <Button size="sm" className="mt-2">Add</Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Out for Today Item */}
-          <div>
-            <h3 className="text-sm font-medium mb-2">Out for Today Preview</h3>
-            <Card className="p-4">
-              <div className="flex gap-4">
-                <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
-                  Image
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-medium">咖喱鸡 | Curry Chicken</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">浓郁香料，温和可口 Rich spices, mild and delicious.</p>
-                  <p className="font-medium">$12.00</p>
-                  <Button size="sm" className="mt-2" disabled>Out of Stock Today</Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Off the Menu Item */}
-          <div>
-            <h3 className="text-sm font-medium mb-2">Off the Menu Preview</h3>
-            <Card className="p-4">
-              <div className="flex gap-4">
-                <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
-                  Image
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-medium">炸鸡翅 | Fried Chicken Wings</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">外酥内嫩，风味十足 Crispy outside, tender inside.</p>
-                  <p className="font-medium">$10.00</p>
-                  <Button size="sm" className="mt-2" disabled>Out of Stock</Button>
-                </div>
-              </div>
-            </Card>
-          </div>
+        <div className="flex items-center gap-4 mb-6">
+          <Select value={selectedDate} onValueChange={(value: DateKey) => setSelectedDate(value)}>
+            <SelectTrigger className="w-[300px]">
+              <SelectValue placeholder="Select date" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">
+                Today ({new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })})
+              </SelectItem>
+              <SelectItem value="today_4hours">
+                Today (4 hours later - {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })})
+              </SelectItem>
+              <SelectItem value="today_5hours">
+                Today (5 hours later - {new Date(Date.now() + 5 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })})
+              </SelectItem>
+              <SelectItem value="tomorrow">
+                Tomorrow ({new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })})
+              </SelectItem>
+              <SelectItem value="next_week">
+                Next Week ({new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })})
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+        <Card className="p-6">
+          <div className="space-y-4">
+            {Object.entries(itemAvailability[selectedDate]).map(([itemName, status]) => (
+              <div key={itemName}>
+                <Card className="p-4">
+                  <div className="flex gap-4">
+                    <div className="w-24 h-24 bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
+                      Image
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-medium">{itemName}</h3>
+                        {itemName === "咖喱鸡" && selectedDate !== "today" && selectedDate !== "today_5hours" && status !== "available" && (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                Edit Status
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Edit Availability - {itemName}</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4 py-4">
+                                <RadioGroup 
+                                  value={status} 
+                                  onValueChange={(value) => updateItemAvailability(selectedDate, itemName, value as AvailabilityStatus)}
+                                  className="space-y-2"
+                                >
+                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                    <RadioGroupItem value="available" id={`${itemName}-available`} />
+                                    <Label htmlFor={`${itemName}-available`} className="flex-1">
+                                      <span className="font-medium">Available</span>
+                                      <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                    <RadioGroupItem value="out_for_four_hours" id={`${itemName}-out-for-four-hours`} />
+                                    <Label htmlFor={`${itemName}-out-for-four-hours`} className="flex-1">
+                                      <span className="font-medium">Out for 4 Hours</span>
+                                      <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                    <RadioGroupItem value="out_for_today" id={`${itemName}-out-for-today`} />
+                                    <Label htmlFor={`${itemName}-out-for-today`} className="flex-1">
+                                      <span className="font-medium">Out for Today</span>
+                                      <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                                    </Label>
+                                  </div>
+                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                    <RadioGroupItem value="off_menu" id={`${itemName}-off-menu`} />
+                                    <Label htmlFor={`${itemName}-off-menu`} className="flex-1">
+                                      <span className="font-medium">Off the Menu</span>
+                                      <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                                    </Label>
+                                  </div>
+                                </RadioGroup>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {itemName === "阿元香草鸡" && "Item is always Available"}
+                        {itemName === "咖喱鸡" && "Item is turned off for the day"}
+                        {itemName === "沙爹" && "Item is turned off for the next 4 hours"}
+                        {itemName === "炸鸡翅" && "Item is off the menu"}
+                      </p>
+                      <p className="font-medium">$14.00</p>
+                      <Button 
+                        size="sm" 
+                        className="mt-2"
+                        disabled={status !== "available"}
+                      >
+                        {status === "available" ? "Add" : 
+                         status === "out_for_today" ? "Out of Stock Today" : 
+                         status === "out_for_four_hours" ? `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` :
+                         "Out of Stock"}
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
 
       {/* Store Availability Modal */}
