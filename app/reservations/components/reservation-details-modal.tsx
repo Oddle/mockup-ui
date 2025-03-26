@@ -1,19 +1,13 @@
 "use client"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { PlusCircle, Info, X } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
 import type { Reservation } from "./reservations-table"
 import { useState } from "react"
 import { TransactionDetailsModal } from "./transaction-details-modal"
-import { cn } from "@/lib/utils"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 interface ReservationDetailsModalProps {
   reservation: Reservation | null

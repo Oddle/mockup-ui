@@ -859,56 +859,6 @@ export default function ItemAvailabilityDemo() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="font-medium">{itemName}</h3>
-                        {itemName === "咖喱鸡" && selectedDate !== "today" && selectedDate !== "today_5hours" && status !== "available" && (
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                Edit Status
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Edit Availability - {itemName}</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4 py-4">
-                                <RadioGroup 
-                                  value={status} 
-                                  onValueChange={(value) => updateItemAvailability(selectedDate, itemName, value as AvailabilityStatus)}
-                                  className="space-y-2"
-                                >
-                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                    <RadioGroupItem value="available" id={`${itemName}-available`} />
-                                    <Label htmlFor={`${itemName}-available`} className="flex-1">
-                                      <span className="font-medium">Available</span>
-                                      <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                    <RadioGroupItem value="out_for_four_hours" id={`${itemName}-out-for-four-hours`} />
-                                    <Label htmlFor={`${itemName}-out-for-four-hours`} className="flex-1">
-                                      <span className="font-medium">Out for 4 Hours</span>
-                                      <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                    <RadioGroupItem value="out_for_today" id={`${itemName}-out-for-today`} />
-                                    <Label htmlFor={`${itemName}-out-for-today`} className="flex-1">
-                                      <span className="font-medium">Out for Today</span>
-                                      <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                    <RadioGroupItem value="off_menu" id={`${itemName}-off-menu`} />
-                                    <Label htmlFor={`${itemName}-off-menu`} className="flex-1">
-                                      <span className="font-medium">Off the Menu</span>
-                                      <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                                    </Label>
-                                  </div>
-                                </RadioGroup>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        )}
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">
                         {itemName === "阿元香草鸡" && "Item is always Available"}
