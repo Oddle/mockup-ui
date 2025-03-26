@@ -166,7 +166,7 @@ export default function ItemAvailabilityDemo() {
   };
 
   // Add state for managing item availability
-  const [itemAvailability, setItemAvailability] = useState(itemAvailabilityByDate);
+  const itemAvailability = itemAvailabilityByDate;
 
   return (
     <div className="container max-w-md mx-auto px-4 py-6">
