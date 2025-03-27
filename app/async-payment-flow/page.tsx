@@ -16,9 +16,21 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useState } from "react"
+import { PaymentInstructions } from "./payment-instructions"
 
 export default function AsyncPaymentFlow() {
   const [paymentMethod, setPaymentMethod] = useState<"credit" | "atm">("credit")
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const handleSubmit = () => {
+    if (paymentMethod === "atm") {
+      setIsSubmitted(true)
+    }
+  }
+
+  if (isSubmitted) {
+    return <PaymentInstructions />
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -141,25 +153,25 @@ export default function AsyncPaymentFlow() {
                   {paymentMethod === "atm" && (
                     <div className="p-3 pt-0 space-y-4">
                       <div>
-                        <Label className="mb-1 block">Select Bank</Label>
+                        <Label className="mb-1 block">付款銀行</Label>
                         <Select>
                           <SelectTrigger>
-                            <SelectValue placeholder="Land Bank of Taiwan" />
+                            <SelectValue placeholder="臺灣世華銀行" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="land-bank">Land Bank of Taiwan</SelectItem>
+                            <SelectItem value="land-bank">臺灣世華銀行</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                        <h4 className="text-sm font-medium text-gray-900">Precautions</h4>
+                        <h4 className="text-sm font-medium text-gray-900">注意事項</h4>
                         <ul className="list-disc text-sm text-gray-600 pl-4 space-y-2">
                           <li>
-                            If the bank that issues the debit card is different from the bank to which the ATM belongs, the bank may charge <span className="text-red-500">an inter-bank transfer fee</span>. The actual amount charged will be based on the announcement of each bank.
+                            如果您使用的提款卡與ATM所屬銀行不同，銀行可能會收取<span className="text-red-500">跨行轉帳手續費</span>。實際收費金額將依各銀行公告為準。
                           </li>
                           <li>
-                            Please be sure to confirm the payment amount and payment deadline before making the payment.
+                            請務必在付款前確認付款金額和付款期限。
                           </li>
                         </ul>
                       </div>
@@ -174,7 +186,10 @@ export default function AsyncPaymentFlow() {
                 </div>
 
                 {/* Submit Button */}
-                <Button className="w-full bg-indigo-900 hover:bg-indigo-800 text-white">
+                <Button 
+                  className="w-full bg-indigo-900 hover:bg-indigo-800 text-white"
+                  onClick={handleSubmit}
+                >
                   確認並付款 NT$30
                 </Button>
               </div>
