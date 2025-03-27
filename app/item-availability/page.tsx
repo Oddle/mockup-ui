@@ -12,7 +12,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Store, Pencil } from "lucide-react";
 
 // Add types for items
@@ -41,12 +40,7 @@ export default function ItemAvailabilityDemo() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState<"available" | "today" | "indefinite" | "four_hours">("available");
   const [segmentedStatus, setSegmentedStatus] = useState<"available" | "today" | "indefinite">("available");
-  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<DateKey>("today");
-
-  // Separate state for Variation 1
-  const [toggleByStoreModalOpen, setToggleByStoreModalOpen] = useState(false);
-  const [selectedItemForToggle, setSelectedItemForToggle] = useState<string | null>(null);
 
   const handleAvailabilityChange = (
     itemName: string,
@@ -94,6 +88,7 @@ export default function ItemAvailabilityDemo() {
   const [itemStatuses, setItemStatuses] = useState<StoreItemStatuses>({});
   const [selectedItemForStock, setSelectedItemForStock] = useState<string | null>(null);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
+  const [storeEditStates, setStoreEditStates] = useState<Record<string, boolean>>({});
 
   // Add new functions for store availability
   const handleStockChange = (storeId: string, itemId: string, status: ItemStatus) => {
@@ -104,6 +99,7 @@ export default function ItemAvailabilityDemo() {
         [itemId]: status
       }
     }));
+    setStoreEditStates(prev => ({ ...prev, [storeId]: false }));
   };
 
   const getStatusColor = (status: string) => {
@@ -779,12 +775,13 @@ export default function ItemAvailabilityDemo() {
                       indefinite: { color: "bg-red-500", text: "Off the Menu" }
                     };
                     
-                    const [isEditOpen, setIsEditOpen] = useState(false);
-                    
                     return (
                       <div key={store.id} className="flex items-center justify-between p-3 rounded-lg border">
                         <div className="font-medium text-sm truncate mr-2">{store.name}</div>
-                        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                        <Dialog 
+                          open={storeEditStates[store.id]} 
+                          onOpenChange={(open) => setStoreEditStates(prev => ({ ...prev, [store.id]: open }))}
+                        >
                           <DialogTrigger asChild>
                             <Button 
                               variant="ghost"
@@ -804,7 +801,6 @@ export default function ItemAvailabilityDemo() {
                                 value={currentStatus}
                                 onValueChange={(value) => {
                                   handleStockChange(store.id, selectedItemForStock || '', value as ItemStatus);
-                                  setIsEditOpen(false);
                                 }}
                                 className="space-y-2"
                               >
