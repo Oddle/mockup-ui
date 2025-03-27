@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Store } from "lucide-react";
+import { Store, Pencil } from "lucide-react";
 
 // Add types for items
 type Item = {
@@ -62,22 +62,6 @@ export default function ItemAvailabilityDemo() {
     handleAvailabilityChange("Chicken Rice", false, newPauseType);
   };
 
-  // Mock data for store availability
-  const storeAvailability = {
-    "Tampines Mall": {
-      status: "Out for Today",
-      lastUpdated: "2 hours ago"
-    },
-    "Jurong Point": {
-      status: "Available",
-      lastUpdated: "1 hour ago"
-    },
-    "NEX": {
-      status: "Off the menu",
-      lastUpdated: "3 days ago"
-    }
-  };
-
   // Add new types for store availability
   type ItemStatus = "available" | "today" | "indefinite";
   type StoreItemStatuses = Record<string, Record<string, ItemStatus>>;
@@ -87,13 +71,27 @@ export default function ItemAvailabilityDemo() {
     { id: "tampines", name: "Tampines Mall" },
     { id: "jurong", name: "Jurong Point" },
     { id: "nex", name: "NEX" },
+    { id: "vivocity", name: "VivoCity" },
+    { id: "jewel", name: "Jewel Changi" },
+    { id: "suntec", name: "Suntec City" },
+    { id: "marina", name: "Marina Square" },
+    { id: "orchard", name: "ION Orchard" },
+    { id: "somerset", name: "313@Somerset" },
+    { id: "bishan", name: "Junction 8" },
+    { id: "amk", name: "AMK Hub" },
+    { id: "clementi", name: "Clementi Mall" },
+    { id: "westgate", name: "Westgate" },
+    { id: "parkway", name: "Parkway Parade" },
+    { id: "compass", name: "Compass One" },
+    { id: "causeway", name: "Causeway Point" },
+    { id: "northpoint", name: "Northpoint City" },
+    { id: "waterway", name: "Waterway Point" },
+    { id: "plaza", name: "Plaza Singapura" },
+    { id: "raffles", name: "Raffles City" }
   ];
 
   // Add new state for store availability
-  const [selectedStore, setSelectedStore] = useState(stores[0].id);
   const [itemStatuses, setItemStatuses] = useState<StoreItemStatuses>({});
-  const [statusSelectionModalOpen, setStatusSelectionModalOpen] = useState(false);
-  const [selectedStoreForStatus, setSelectedStoreForStatus] = useState<string | null>(null);
   const [selectedItemForStock, setSelectedItemForStock] = useState<string | null>(null);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
 
@@ -106,7 +104,6 @@ export default function ItemAvailabilityDemo() {
         [itemId]: status
       }
     }));
-    setStatusSelectionModalOpen(false);
   };
 
   const getStatusColor = (status: string) => {
@@ -167,6 +164,10 @@ export default function ItemAvailabilityDemo() {
 
   // Add state for managing item availability
   const itemAvailability = itemAvailabilityByDate;
+
+  // Add state for visibility settings
+  const [showOnOddleShop, setShowOnOddleShop] = useState(true);
+  const [showOnRegister, setShowOnRegister] = useState(true);
 
   return (
     <div className="container max-w-md mx-auto px-4 py-6">
@@ -328,205 +329,47 @@ export default function ItemAvailabilityDemo() {
 
           {/* Store-specific Availability Pattern */}
           <div className="space-y-6">
-            <div>
-              <h3 className="text-base font-medium mb-2">Variation 1: Toggle By Store</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Manage item availability for a specific store
-              </p>
-              <Card className="p-6">
-                <div className="mb-6">
-                  <Select value={selectedStore} onValueChange={setSelectedStore}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a store" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {stores.map((store) => (
-                        <SelectItem key={store.id} value={store.id}>
-                          {store.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-4">
-                  {items.map((item) => (
-                    <Card key={item.id} className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-medium">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground">{item.price}</p>
-                        </div>
-                        <Dialog open={toggleByStoreModalOpen && selectedItemForToggle === item.id} onOpenChange={setToggleByStoreModalOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => setSelectedItemForToggle(item.id)}
-                              className={cn(
-                                "h-8 px-3",
-                                "hover:bg-muted",
-                                "flex items-center gap-2"
-                              )}
-                            >
-                              <div className={cn(
-                                "w-2 h-2 rounded-full",
-                                getStatusColor(getStoreItemStatus(item.id, selectedStore))
-                              )} />
-                              <span>{getStatusText(getStoreItemStatus(item.id, selectedStore))}</span>
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Edit Availability - {item.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <RadioGroup 
-                                value={getStoreItemStatus(item.id, selectedStore)} 
-                                onValueChange={(value) => {
-                                  handleStockChange(selectedStore, item.id, value as ItemStatus);
-                                  setToggleByStoreModalOpen(false);
-                                }} 
-                                className="space-y-2"
-                              >
-                                <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                  <RadioGroupItem value="available" id={`${item.id}-available`} />
-                                  <Label htmlFor={`${item.id}-available`} className="flex-1">
-                                    <span className="font-medium">Available</span>
-                                    <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                  <RadioGroupItem value="today" id={`${item.id}-today`} />
-                                  <Label htmlFor={`${item.id}-today`} className="flex-1">
-                                    <span className="font-medium">Out of Stock for Today</span>
-                                    <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                  <RadioGroupItem value="indefinite" id={`${item.id}-indefinite`} />
-                                  <Label htmlFor={`${item.id}-indefinite`} className="flex-1">
-                                    <span className="font-medium">Off the Menu</span>
-                                    <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                                  </Label>
-                                </div>
-                              </RadioGroup>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            <div>
-              <h3 className="text-base font-medium mb-2">Variation 2: Store Stock Availability</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                View and manage availability across all stores
-              </p>
-              <Card className="p-6">
-                <div className="space-y-4">
-                  {items.map((item) => (
-                    <Card key={item.id} className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-medium">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground">{item.price}</p>
-                        </div>
-                        <Dialog open={isStockModalOpen && selectedItemForStock === item.id} onOpenChange={setIsStockModalOpen}>
-                          <DialogTrigger asChild>
+            <Card className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Items</h3>
+                  <div className="space-y-4">
+                    {items.map((item) => (
+                      <Card key={item.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-medium">{item.name}</h3>
+                            <p className="text-sm text-muted-foreground">{item.price}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
                             <Button 
                               variant="ghost" 
                               size="sm"
-                              onClick={() => setSelectedItemForStock(item.id)}
+                              onClick={() => {
+                                setSelectedItemForStock(item.id);
+                                setIsStockModalOpen(true);
+                              }}
                               className="h-8 w-8 p-0"
                             >
                               <Store className="h-4 w-4" />
                               <span className="sr-only">Store Availability</span>
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Store Availability - {item.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              {stores.map((store) => (
-                                <Card key={store.id} className="p-4">
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <h3 className="font-medium">{store.name}</h3>
-                                    </div>
-                                    <Dialog 
-                                      open={statusSelectionModalOpen && selectedStoreForStatus === store.id} 
-                                      onOpenChange={setStatusSelectionModalOpen}
-                                    >
-                                      <DialogTrigger asChild>
-                                        <Button 
-                                          variant="outline" 
-                                          size="sm"
-                                          onClick={() => setSelectedStoreForStatus(store.id)}
-                                          className={cn(
-                                            "h-8 px-3",
-                                            "hover:bg-muted",
-                                            "flex items-center gap-2"
-                                          )}
-                                        >
-                                          <div className={cn(
-                                            "w-2 h-2 rounded-full",
-                                            getStatusColor(getStoreItemStatus(item.id, store.id))
-                                          )} />
-                                          <span>{getStatusText(getStoreItemStatus(item.id, store.id))}</span>
-                                        </Button>
-                                      </DialogTrigger>
-                                      <DialogContent className="sm:max-w-[425px]">
-                                        <DialogHeader>
-                                          <DialogTitle>Set Status - {store.name}</DialogTitle>
-                                        </DialogHeader>
-                                        <div className="space-y-4 py-4">
-                                          <RadioGroup 
-                                            value={getStoreItemStatus(item.id, store.id)} 
-                                            onValueChange={(value) => handleStockChange(store.id, item.id, value as ItemStatus)}
-                                            className="space-y-2"
-                                          >
-                                            <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                              <RadioGroupItem value="available" id={`${item.id}-${store.id}-available`} />
-                                              <Label htmlFor={`${item.id}-${store.id}-available`} className="flex-1">
-                                                <span className="font-medium">Available</span>
-                                                <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                                              </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                              <RadioGroupItem value="today" id={`${item.id}-${store.id}-today`} />
-                                              <Label htmlFor={`${item.id}-${store.id}-today`} className="flex-1">
-                                                <span className="font-medium">Out of Stock for Today</span>
-                                                <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                                              </Label>
-                                            </div>
-                                            <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                              <RadioGroupItem value="indefinite" id={`${item.id}-${store.id}-indefinite`} />
-                                              <Label htmlFor={`${item.id}-${store.id}-indefinite`} className="flex-1">
-                                                <span className="font-medium">Off the Menu</span>
-                                                <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                                              </Label>
-                                            </div>
-                                          </RadioGroup>
-                                        </div>
-                                      </DialogContent>
-                                    </Dialog>
-                                  </div>
-                                </Card>
-                              ))}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </Card>
-                  ))}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Pencil className="h-4 w-4" />
+                              <span className="sr-only">Edit Item</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
-              </Card>
-            </div>
+              </div>
+            </Card>
           </div>
         </section>
 
@@ -875,43 +718,128 @@ export default function ItemAvailabilityDemo() {
         </Card>
       </div>
 
-      {/* Store Availability Modal */}
-      <Dialog open={isStoreModalOpen} onOpenChange={setIsStoreModalOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+      {/* Store Stock Availability Modal */}
+      <Dialog open={isStockModalOpen} onOpenChange={setIsStockModalOpen}>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Store Availability - Roti Prata</DialogTitle>
+            <DialogTitle className="text-2xl">Item Availability</DialogTitle>
           </DialogHeader>
-          <Tabs defaultValue="Tampines Mall" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              {Object.keys(storeAvailability).map((store) => (
-                <TabsTrigger key={store} value={store}>
-                  {store}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {Object.entries(storeAvailability).map(([store, data]) => (
-              <TabsContent key={store} value={store}>
-                <div className="space-y-4">
+          
+          {/* Main Content with Scroll */}
+          <div className="flex-1 overflow-y-auto pr-2">
+            <div className="space-y-6">
+              {/* Visibility Section */}
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Visibility on Menu</h2>
+                <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        "w-2 h-2 rounded-full",
-                        data.status === "Available" && "bg-green-500",
-                        data.status === "Out for Today" && "bg-yellow-500",
-                        data.status === "Off the menu" && "bg-red-500"
-                      )} />
-                      <span className="font-medium">{data.status}</span>
-                    </div>
-                    <span className="text-sm text-muted-foreground">Updated {data.lastUpdated}</span>
+                    <Label htmlFor="modal-oddle-shop" className="flex items-center gap-2">
+                      <Store className="h-4 w-4" />
+                      Show item on Oddle Shop
+                    </Label>
+                    <Switch
+                      id="modal-oddle-shop"
+                      checked={showOnOddleShop}
+                      onCheckedChange={setShowOnOddleShop}
+                    />
                   </div>
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">Edit</Button>
-                    <Button size="sm">Save Changes</Button>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="modal-register" className="flex items-center gap-2">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
+                        <path d="M4 9C4 7.89543 4.89543 7 6 7H18C19.1046 7 20 7.89543 20 9V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V9Z" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7" stroke="currentColor" strokeWidth="2"/>
+                      </svg>
+                      Show item on Register
+                    </Label>
+                    <Switch
+                      id="modal-register"
+                      checked={showOnRegister}
+                      onCheckedChange={setShowOnRegister}
+                    />
                   </div>
+                  {showOnOddleShop && showOnRegister && (
+                    <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
+                      The item will be shown on both Oddle Shop and Register.
+                    </p>
+                  )}
                 </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Store Availability Section */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Availability at Stores</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {stores.map((store) => {
+                    const currentStatus = getStoreItemStatus(selectedItemForStock || '', store.id);
+                    const statusConfig = {
+                      available: { color: "bg-green-500", text: "Available" },
+                      today: { color: "bg-yellow-500", text: "Out for Today" },
+                      indefinite: { color: "bg-red-500", text: "Off the Menu" }
+                    };
+                    
+                    const [isEditOpen, setIsEditOpen] = useState(false);
+                    
+                    return (
+                      <div key={store.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div className="font-medium text-sm truncate mr-2">{store.name}</div>
+                        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              variant="ghost"
+                              size="sm"
+                              className="flex items-center gap-2 hover:bg-muted h-7 px-2 min-w-[120px] justify-between"
+                            >
+                              <div className={`w-2 h-2 rounded-full ${statusConfig[currentStatus].color}`} />
+                              <span className="text-xs">{statusConfig[currentStatus].text}</span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                              <DialogTitle>Edit Store Availability</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <RadioGroup 
+                                value={currentStatus}
+                                onValueChange={(value) => {
+                                  handleStockChange(store.id, selectedItemForStock || '', value as ItemStatus);
+                                  setIsEditOpen(false);
+                                }}
+                                className="space-y-2"
+                              >
+                                <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                  <RadioGroupItem value="available" id={`${store.id}-${selectedItemForStock}-available`} />
+                                  <Label htmlFor={`${store.id}-${selectedItemForStock}-available`} className="flex-1">
+                                    <span className="font-medium">Available</span>
+                                    <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                  <RadioGroupItem value="today" id={`${store.id}-${selectedItemForStock}-today`} />
+                                  <Label htmlFor={`${store.id}-${selectedItemForStock}-today`} className="flex-1">
+                                    <span className="font-medium">Out for Today</span>
+                                    <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-3 rounded-lg border p-3">
+                                  <RadioGroupItem value="indefinite" id={`${store.id}-${selectedItemForStock}-indefinite`} />
+                                  <Label htmlFor={`${store.id}-${selectedItemForStock}-indefinite`} className="flex-1">
+                                    <span className="font-medium">Off the Menu</span>
+                                    <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
