@@ -102,24 +102,6 @@ export default function ItemAvailabilityDemo() {
     setStoreEditStates(prev => ({ ...prev, [storeId]: false }));
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "available": return "bg-green-500";
-      case "today": return "bg-yellow-500";
-      case "indefinite": return "bg-red-500";
-      default: return "bg-gray-500";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "available": return "Available";
-      case "today": return "Out of Stock for Today";
-      case "indefinite": return "Off the Menu";
-      default: return "Set Status";
-    }
-  };
-
   const getStoreItemStatus = (itemId: string, storeId: string): ItemStatus => {
     return itemStatuses[storeId]?.[itemId] || "available";
   };
