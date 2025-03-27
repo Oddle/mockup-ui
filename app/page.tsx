@@ -3,12 +3,18 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
-import { KeyRound, UserPlus, ClipboardCheck, Calendar, ClipboardList } from "lucide-react"
+import { KeyRound, UserPlus, ClipboardCheck, Calendar, ClipboardList, CreditCard } from "lucide-react"
 
 export default function Home() {
   const router = useRouter()
 
   const mainPages = [
+    { 
+      name: "Async Payment Flow", 
+      path: "/async-payment-flow",
+      description: "View ATM payment reservation flow states",
+      icon: CreditCard
+    },
     { 
       name: "Reservations", 
       path: "/reservations",
