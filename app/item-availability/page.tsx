@@ -75,7 +75,7 @@ export default function ItemAvailabilityDemo() {
     if (categoryStatus !== "available") {
       toast({
         title: "Cannot modify item",
-        description: `This item cannot be modified because the category "${getStatusText(categoryStatus)}" is set. Please change the category status to "Available" to modify individual items.`,
+        description: `This item cannot be modified because the category &quot;${getStatusText(categoryStatus)}&quot; is set. Please change the category status to &quot;Available&quot; to modify individual items.`,
         variant: "destructive",
       });
       return;
@@ -84,11 +84,6 @@ export default function ItemAvailabilityDemo() {
       ...prev,
       [itemId]: status
     }));
-  };
-
-  // Add function to check if item is locked
-  const isItemLocked = () => {
-    return categoryStatus !== "available";
   };
 
   // Add function to get status color
@@ -131,7 +126,7 @@ export default function ItemAvailabilityDemo() {
 
   // Add new types for store availability
   type ItemStatus = "available" | "today" | "indefinite";
-  type StoreItemStatuses = Record<string, Record<string, ItemStatus>>;
+  type StoreStatuses = Record<string, Record<string, ItemStatus>>;
 
   // Mock data for stores
   const stores = [
@@ -161,10 +156,11 @@ export default function ItemAvailabilityDemo() {
   const [selectedItemForStock, setSelectedItemForStock] = useState<string | null>(null);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [storeEditStates, setStoreEditStates] = useState<Record<string, boolean>>({});
+  const [storeStatuses, setStoreStatuses] = useState<StoreStatuses>({});
 
   // Add new functions for store availability
   const handleStockChange = (storeId: string, itemId: string, status: ItemStatus) => {
-    setItemStatuses(prev => ({
+    setStoreStatuses(prev => ({
       ...prev,
       [storeId]: {
         ...(prev[storeId] || {}),
@@ -175,7 +171,7 @@ export default function ItemAvailabilityDemo() {
   };
 
   const getStoreItemStatus = (itemId: string, storeId: string): ItemStatus => {
-    return itemStatuses[storeId]?.[itemId] || "available";
+    return storeStatuses[storeId]?.[itemId] || "available";
   };
 
   // Mock data for item availability by date
