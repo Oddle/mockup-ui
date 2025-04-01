@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Store, Pencil } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Add types for items
 type Item = {
@@ -35,12 +36,84 @@ type ItemAvailability = Record<string, AvailabilityStatus>;
 type ItemAvailabilityByDate = Record<DateKey, ItemAvailability>;
 
 export default function ItemAvailabilityDemo() {
+  const { toast } = useToast();
   const [isPaused, setIsPaused] = useState(false);
   const [pauseType, setPauseType] = useState<"today" | "indefinite">("today");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalStatus, setModalStatus] = useState<"available" | "today" | "indefinite" | "four_hours">("available");
   const [segmentedStatus, setSegmentedStatus] = useState<"available" | "today" | "indefinite">("available");
   const [selectedDate, setSelectedDate] = useState<DateKey>("today");
+  // Add new state for category and item statuses
+  const [categoryStatus, setCategoryStatus] = useState<"available" | "today" | "indefinite">("available");
+  const [itemStatuses, setItemStatuses] = useState<Record<string, "available" | "today" | "indefinite">>({
+    "nasi-goreng": "available",
+    "mee-goreng": "available"
+  });
+
+  // Add new state for category dialog
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+
+  // Add new state for item dialogs
+  const [isNasiDialogOpen, setIsNasiDialogOpen] = useState(false);
+  const [isMeeDialogOpen, setIsMeeDialogOpen] = useState(false);
+
+  // Add function to handle category status change
+  const handleCategoryStatusChange = (status: "available" | "today" | "indefinite") => {
+    setCategoryStatus(status);
+    // Propagate status to all items in the category
+    setItemStatuses({
+      "nasi-goreng": status,
+      "mee-goreng": status
+    });
+    // Close the dialog after selection
+    setIsCategoryDialogOpen(false);
+  };
+
+  // Add function to handle individual item status change
+  const handleItemStatusChange = (itemId: string, status: "available" | "today" | "indefinite") => {
+    // Only allow item status changes if category is available
+    if (categoryStatus !== "available") {
+      toast({
+        title: "Cannot modify item",
+        description: `This item cannot be modified because the category "${getStatusText(categoryStatus)}" is set. Please change the category status to "Available" to modify individual items.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    setItemStatuses(prev => ({
+      ...prev,
+      [itemId]: status
+    }));
+  };
+
+  // Add function to check if item is locked
+  const isItemLocked = () => {
+    return categoryStatus !== "available";
+  };
+
+  // Add function to get status color
+  const getStatusColor = (status: "available" | "today" | "indefinite") => {
+    switch (status) {
+      case "available":
+        return "bg-green-500";
+      case "today":
+        return "bg-yellow-500";
+      case "indefinite":
+        return "bg-red-500";
+    }
+  };
+
+  // Add function to get status text
+  const getStatusText = (status: "available" | "today" | "indefinite") => {
+    switch (status) {
+      case "available":
+        return "Available";
+      case "today":
+        return "Out for Today";
+      case "indefinite":
+        return "Off the menu";
+    }
+  };
 
   const handleAvailabilityChange = (
     itemName: string,
@@ -85,7 +158,6 @@ export default function ItemAvailabilityDemo() {
   ];
 
   // Add new state for store availability
-  const [itemStatuses, setItemStatuses] = useState<StoreItemStatuses>({});
   const [selectedItemForStock, setSelectedItemForStock] = useState<string | null>(null);
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [storeEditStates, setStoreEditStates] = useState<Record<string, boolean>>({});
@@ -287,6 +359,200 @@ export default function ItemAvailabilityDemo() {
                   </div>
                 </DialogContent>
               </Dialog>
+            </div>
+          </Card>
+
+          {/* Category Section */}
+          <Card className="p-4 mt-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h3 className="font-medium">Main Course</h3>
+                  <Badge variant="outline" className="text-xs">Category</Badge>
+                </div>
+                <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className={cn(
+                        "h-8 px-3",
+                        "hover:bg-muted",
+                        "flex items-center gap-2"
+                      )}
+                    >
+                      <div className={cn("w-2 h-2 rounded-full", getStatusColor(categoryStatus))} />
+                      <span>{getStatusText(categoryStatus)}</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Category Availability - Main Course</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <RadioGroup 
+                        value={categoryStatus} 
+                        onValueChange={(value) => {
+                          handleCategoryStatusChange(value as "available" | "today" | "indefinite");
+                          // Close the dialog after selection
+                          const dialog = document.querySelector('[role="dialog"]');
+                          if (dialog) {
+                            (dialog as HTMLElement).click();
+                          }
+                        }}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="available" id="category-available" />
+                          <Label htmlFor="category-available" className="flex-1">
+                            <span className="font-medium">Available</span>
+                            <span className="block text-xs text-muted-foreground">All items in this category are available</span>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="today" id="category-today" />
+                          <Label htmlFor="category-today" className="flex-1">
+                            <span className="font-medium">Out for Today</span>
+                            <span className="block text-xs text-muted-foreground">All items will be back tomorrow at 12:00 AM</span>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value="indefinite" id="category-indefinite" />
+                          <Label htmlFor="category-indefinite" className="flex-1">
+                            <span className="font-medium">Off the menu</span>
+                            <span className="block text-xs text-muted-foreground">All items stay unavailable until reactivated</span>
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* Category Items */}
+              <div className="space-y-2 pl-4 border-l-2 border-muted">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-medium">Nasi Goreng</h3>
+                  </div>
+                  <Dialog open={isNasiDialogOpen} onOpenChange={setIsNasiDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={cn(
+                          "h-8 px-3",
+                          "hover:bg-muted",
+                          "flex items-center gap-2",
+                          categoryStatus !== "available" && "opacity-50 cursor-not-allowed"
+                        )}
+                        disabled={categoryStatus !== "available"}
+                      >
+                        <div className={cn("w-2 h-2 rounded-full", getStatusColor(itemStatuses["nasi-goreng"]))} />
+                        <span>{getStatusText(itemStatuses["nasi-goreng"])}</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Availability - Nasi Goreng</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <RadioGroup 
+                          value={itemStatuses["nasi-goreng"]} 
+                          onValueChange={(value) => {
+                            handleItemStatusChange("nasi-goreng", value as "available" | "today" | "indefinite");
+                            setIsNasiDialogOpen(false);
+                          }}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value="available" id="nasi-available" />
+                            <Label htmlFor="nasi-available" className="flex-1">
+                              <span className="font-medium">Available</span>
+                              <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value="today" id="nasi-today" />
+                            <Label htmlFor="nasi-today" className="flex-1">
+                              <span className="font-medium">Out for Today</span>
+                              <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value="indefinite" id="nasi-indefinite" />
+                            <Label htmlFor="nasi-indefinite" className="flex-1">
+                              <span className="font-medium">Off the menu</span>
+                              <span className="block text-xs text-muted-foreground">Item stays unavailable until reactivated</span>
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-medium">Mee Goreng</h3>
+                  </div>
+                  <Dialog open={isMeeDialogOpen} onOpenChange={setIsMeeDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={cn(
+                          "h-8 px-3",
+                          "hover:bg-muted",
+                          "flex items-center gap-2",
+                          categoryStatus !== "available" && "opacity-50 cursor-not-allowed"
+                        )}
+                        disabled={categoryStatus !== "available"}
+                      >
+                        <div className={cn("w-2 h-2 rounded-full", getStatusColor(itemStatuses["mee-goreng"]))} />
+                        <span>{getStatusText(itemStatuses["mee-goreng"])}</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Availability - Mee Goreng</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <RadioGroup 
+                          value={itemStatuses["mee-goreng"]} 
+                          onValueChange={(value) => {
+                            handleItemStatusChange("mee-goreng", value as "available" | "today" | "indefinite");
+                            setIsMeeDialogOpen(false);
+                          }}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value="available" id="mee-available" />
+                            <Label htmlFor="mee-available" className="flex-1">
+                              <span className="font-medium">Available</span>
+                              <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value="today" id="mee-today" />
+                            <Label htmlFor="mee-today" className="flex-1">
+                              <span className="font-medium">Out for Today</span>
+                              <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
+                            </Label>
+                          </div>
+                          <div className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value="indefinite" id="mee-indefinite" />
+                            <Label htmlFor="mee-indefinite" className="flex-1">
+                              <span className="font-medium">Off the menu</span>
+                              <span className="block text-xs text-muted-foreground">Item stays unavailable until reactivated</span>
+                            </Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
             </div>
           </Card>
         </section>
