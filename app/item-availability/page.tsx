@@ -286,9 +286,9 @@ export default function ItemAvailabilityDemo() {
               </div>
               <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className={cn(
                       "h-8 px-3",
                       "hover:bg-muted",
@@ -315,12 +315,12 @@ export default function ItemAvailabilityDemo() {
                     <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
-                    <RadioGroup 
-                      value={modalStatus} 
+                    <RadioGroup
+                      value={modalStatus}
                       onValueChange={(value) => {
                         setModalStatus(value as "available" | "today" | "indefinite" | "four_hours");
                         setIsModalOpen(false);
-                      }} 
+                      }}
                       className="space-y-2"
                     >
                       <div className="flex items-center space-x-3 rounded-lg border p-3">
@@ -359,18 +359,26 @@ export default function ItemAvailabilityDemo() {
           </Card>
 
           {/* Category Section */}
+          <Separator className="my-8" />
+
+          {/* Menu Management Section */}
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-lg font-semibold">Category with Nested Items</div>
+            </div>
+          </section>
+
           <Card className="p-4 mt-4">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <h3 className="font-medium">Main Course</h3>
-                  <Badge variant="outline" className="text-xs">Category</Badge>
                 </div>
                 <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className={cn(
                         "h-8 px-3",
                         "hover:bg-muted",
@@ -386,8 +394,8 @@ export default function ItemAvailabilityDemo() {
                       <DialogTitle>Edit Category Availability - Main Course</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
-                      <RadioGroup 
-                        value={categoryStatus} 
+                      <RadioGroup
+                        value={categoryStatus}
                         onValueChange={(value) => {
                           handleCategoryStatusChange(value as "available" | "today" | "indefinite");
                           // Close the dialog after selection
@@ -433,9 +441,9 @@ export default function ItemAvailabilityDemo() {
                   </div>
                   <Dialog open={isNasiDialogOpen} onOpenChange={setIsNasiDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className={cn(
                           "h-8 px-3",
                           "hover:bg-muted",
@@ -453,8 +461,8 @@ export default function ItemAvailabilityDemo() {
                         <DialogTitle>Edit Availability - Nasi Goreng</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
-                        <RadioGroup 
-                          value={itemStatuses["nasi-goreng"]} 
+                        <RadioGroup
+                          value={itemStatuses["nasi-goreng"]}
                           onValueChange={(value) => {
                             handleItemStatusChange("nasi-goreng", value as "available" | "today" | "indefinite");
                             setIsNasiDialogOpen(false);
@@ -494,9 +502,9 @@ export default function ItemAvailabilityDemo() {
                   </div>
                   <Dialog open={isMeeDialogOpen} onOpenChange={setIsMeeDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className={cn(
                           "h-8 px-3",
                           "hover:bg-muted",
@@ -514,8 +522,8 @@ export default function ItemAvailabilityDemo() {
                         <DialogTitle>Edit Availability - Mee Goreng</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
-                        <RadioGroup 
-                          value={itemStatuses["mee-goreng"]} 
+                        <RadioGroup
+                          value={itemStatuses["mee-goreng"]}
                           onValueChange={(value) => {
                             handleItemStatusChange("mee-goreng", value as "available" | "today" | "indefinite");
                             setIsMeeDialogOpen(false);
@@ -582,8 +590,8 @@ export default function ItemAvailabilityDemo() {
                             <p className="text-sm text-muted-foreground">{item.price}</p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="sm"
                               onClick={() => {
                                 setSelectedItemForStock(item.id);
@@ -659,7 +667,7 @@ export default function ItemAvailabilityDemo() {
                 {/* Option 1: Right-aligned Controls */}
                 <section>
                   <h2 className="text-lg font-semibold mb-3">3. Toggle Variations</h2>
-                  
+
                   {/* Variation A: Inline with Description */}
                   <Card className="p-4 mb-4">
                     <div className="flex items-center justify-between">
@@ -796,7 +804,7 @@ export default function ItemAvailabilityDemo() {
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium">Chicken Rice</h3>
                         {isPaused && (
-                          <div 
+                          <div
                             className={cn(
                               "px-1.5 py-0.5 rounded text-xs font-medium",
                               pauseType === "today" ? "bg-yellow-50 text-yellow-700" : "bg-red-50 text-red-700"
@@ -939,15 +947,15 @@ export default function ItemAvailabilityDemo() {
                         {itemName === "炸鸡翅" && "Item is off the menu"}
                       </p>
                       <p className="font-medium">$14.00</p>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="mt-2"
                         disabled={status !== "available"}
                       >
-                        {status === "available" ? "Add" : 
-                         status === "out_for_today" ? "Out of Stock Today" : 
-                         status === "out_for_four_hours" ? `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` :
-                         "Out of Stock"}
+                        {status === "available" ? "Add" :
+                          status === "out_for_today" ? "Out of Stock Today" :
+                            status === "out_for_four_hours" ? `Out until ${new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` :
+                              "Out of Stock"}
                       </Button>
                     </div>
                   </div>
@@ -964,7 +972,7 @@ export default function ItemAvailabilityDemo() {
           <DialogHeader>
             <DialogTitle className="text-2xl">Item Availability</DialogTitle>
           </DialogHeader>
-          
+
           {/* Main Content with Scroll */}
           <div className="flex-1 overflow-y-auto pr-2">
             <div className="space-y-6">
@@ -986,8 +994,8 @@ export default function ItemAvailabilityDemo() {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="modal-register" className="flex items-center gap-2">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4">
-                        <path d="M4 9C4 7.89543 4.89543 7 6 7H18C19.1046 7 20 7.89543 20 9V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V9Z" stroke="currentColor" strokeWidth="2"/>
-                        <path d="M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M4 9C4 7.89543 4.89543 7 6 7H18C19.1046 7 20 7.89543 20 9V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V9Z" stroke="currentColor" strokeWidth="2" />
+                        <path d="M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7" stroke="currentColor" strokeWidth="2" />
                       </svg>
                       Show item on Register
                     </Label>
@@ -1018,16 +1026,16 @@ export default function ItemAvailabilityDemo() {
                       today: { color: "bg-yellow-500", text: "Out for Today" },
                       indefinite: { color: "bg-red-500", text: "Off the Menu" }
                     };
-                    
+
                     return (
                       <div key={store.id} className="flex items-center justify-between p-3 rounded-lg border">
                         <div className="font-medium text-sm truncate mr-2">{store.name}</div>
-                        <Dialog 
-                          open={storeEditStates[store.id]} 
+                        <Dialog
+                          open={storeEditStates[store.id]}
                           onOpenChange={(open) => setStoreEditStates(prev => ({ ...prev, [store.id]: open }))}
                         >
                           <DialogTrigger asChild>
-                            <Button 
+                            <Button
                               variant="ghost"
                               size="sm"
                               className="flex items-center gap-2 hover:bg-muted h-7 px-2 min-w-[120px] justify-between"
@@ -1041,7 +1049,7 @@ export default function ItemAvailabilityDemo() {
                               <DialogTitle>Edit Store Availability</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
-                              <RadioGroup 
+                              <RadioGroup
                                 value={currentStatus}
                                 onValueChange={(value) => {
                                   handleStockChange(store.id, selectedItemForStock || '', value as ItemStatus);
