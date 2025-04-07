@@ -10,6 +10,7 @@
             background-color: #f0f0f0;
             margin: 0;
             padding: 20px;
+            font-size: 16px;
         }
         .container {
             max-width: 600px;
@@ -25,18 +26,9 @@
             border-bottom: 1px solid #eee;
             margin-bottom: 32px;
         }
-        .button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #3D0099;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin: 24px 0;
-            font-weight: 600;
-        }
-        .button:hover {
-            background-color: #4800b8;
+        .header img {
+            max-width: 150px;
+            margin-bottom: 16px;
         }
         .section {
             margin: 32px 0;
@@ -83,23 +75,21 @@
             text-decoration: underline;
         }
         .welcome-text {
-            font-size: 16px;
             color: #666;
             margin-bottom: 32px;
             text-align: center;
         }
         .solutions-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-            margin: 24px 0;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
         .solution-card {
-            padding: 24px;
+            padding: 20px;
             margin: 12px 0;
-            border: 2px solid #3D0099;
-            border-radius: 8px;
-            background-color: #FDFAFF;
+            border: 1px solid #eeeeee;
+            border-radius: 6px;
+            background-color: #f9f9f9;
             transition: transform 0.2s ease;
         }
         .solution-card:hover {
@@ -107,28 +97,33 @@
             box-shadow: 0 4px 12px rgba(61, 0, 153, 0.1);
         }
         .solution-card h3 {
-            color: #3D0099;
+            color: #222222;
             font-size: 20px;
             font-weight: 600;
             margin: 0 0 12px;
             letter-spacing: -0.01em;
         }
         .solution-card p {
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.6;
-            margin: 0;
+            margin: 0 0 10px 0;
             color: #444;
+        }
+        .solution-card ul li {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #555;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://framerusercontent.com/images/hjzDozH8DmhdjYxFOgRILnm9s.svg" alt="Oddle Logo" style="height: 40px; width: auto;">
+            <img src="https://ucarecdn.com/7795ffb7-c75e-41a3-a7d3-ed32a221fce1/-/preview/194x80/" alt="Oddle Logo" style="height: 40px; width: auto;">
         </div>
 
-        <h1>Welcome to Oddle, {{firstName}}!</h1>
-        <p class="welcome-text">Thank you for choosing Oddle! Here's what we'll be setting up to help grow your F&B business:</p>
+        <h1>Thank you for growing with us, {{firstName}}!</h1>
+        <p class="welcome-text">You have subscribed to the following products:</p>
 
         <div class="section">
             <div class="solutions-grid">
@@ -136,6 +131,15 @@
                 <div class="solution-card">
                     <h3>{{name}}</h3>
                     <p>{{description}}</p>
+
+                    <ul style="margin-top: 10px;">
+                        {{#each prices}}
+                        <li style="margin-bottom: 5px;">
+                            S${{value}} {{description}}
+                        </li>
+                        {{/each}}
+                    </ul>
+
                 </div>
                 {{/each}}
             </div>
