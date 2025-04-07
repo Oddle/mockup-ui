@@ -410,7 +410,7 @@ export default function ItemAvailabilityDemo() {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Update Main Course Availability</DialogTitle>
+                      <DialogTitle>Update Main Course Items Availability</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <RadioGroup
