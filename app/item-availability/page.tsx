@@ -15,6 +15,44 @@ import { useState } from "react";
 import { Store, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+// Define common availability options
+const availabilityOptions = [
+  {
+    value: "available",
+    label: "Available",
+    description: "In stock here",
+  },
+  {
+    value: "today",
+    label: "Out for Today",
+    description: "Out of store here for today",
+  },
+  {
+    value: "indefinite",
+    label: "Off the menu",
+    description: "Permanently out of stock here",
+  },
+];
+
+// Define category-specific availability options
+const categoryAvailabilityOptions = [
+  {
+    value: "available",
+    label: "Available",
+    description: "All items are in stock here",
+  },
+  {
+    value: "today",
+    label: "Out for Today",
+    description: "All items are out of stock for today.",
+  },
+  {
+    value: "indefinite",
+    label: "Off the menu",
+    description: "All items are permanently out of stock."
+  },
+];
+
 // Add types for items
 type Item = {
   id: string;
@@ -323,34 +361,15 @@ export default function ItemAvailabilityDemo() {
                       }}
                       className="space-y-2"
                     >
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="available" id="modal-available" />
-                        <Label htmlFor="modal-available" className="flex-1">
-                          <span className="font-medium">Available</span>
-                          <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="four_hours" id="modal-four-hours" />
-                        <Label htmlFor="modal-four-hours" className="flex-1">
-                          <span className="font-medium">Out for 4 Hours</span>
-                          <span className="block text-xs text-muted-foreground">Item will be back at {new Date(Date.now() + 4 * 60 * 60 * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="today" id="modal-today" />
-                        <Label htmlFor="modal-today" className="flex-1">
-                          <span className="font-medium">Out for Today</span>
-                          <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-3 rounded-lg border p-3">
-                        <RadioGroupItem value="indefinite" id="modal-indefinite" />
-                        <Label htmlFor="modal-indefinite" className="flex-1">
-                          <span className="font-medium">Off the menu</span>
-                          <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                        </Label>
-                      </div>
+                      {availabilityOptions.map((option) => (
+                        <div key={option.value} className="flex items-center space-x-3 rounded-lg border p-3">
+                          <RadioGroupItem value={option.value} id={`modal-${option.value}`} />
+                          <Label htmlFor={`modal-${option.value}`} className="flex-1">
+                            <span className="font-medium">{option.label}</span>
+                            <span className="block text-xs text-muted-foreground">{option.description}</span>
+                          </Label>
+                        </div>
+                      ))}
                     </RadioGroup>
                   </div>
                 </DialogContent>
@@ -406,27 +425,15 @@ export default function ItemAvailabilityDemo() {
                         }}
                         className="space-y-2"
                       >
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="available" id="category-available" />
-                          <Label htmlFor="category-available" className="flex-1">
-                            <span className="font-medium">Available</span>
-                            <span className="block text-xs text-muted-foreground">All items in this category are available</span>
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="today" id="category-today" />
-                          <Label htmlFor="category-today" className="flex-1">
-                            <span className="font-medium">Out for Today</span>
-                            <span className="block text-xs text-muted-foreground">All items will be back tomorrow at 12:00 AM</span>
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-3 rounded-lg border p-3">
-                          <RadioGroupItem value="indefinite" id="category-indefinite" />
-                          <Label htmlFor="category-indefinite" className="flex-1">
-                            <span className="font-medium">Off the menu</span>
-                            <span className="block text-xs text-muted-foreground">All items stay unavailable until reactivated</span>
-                          </Label>
-                        </div>
+                        {categoryAvailabilityOptions.map((option) => (
+                          <div key={option.value} className="flex items-center space-x-3 rounded-lg border p-3">
+                            <RadioGroupItem value={option.value} id={`category-${option.value}`} />
+                            <Label htmlFor={`category-${option.value}`} className="flex-1">
+                              <span className="font-medium">{option.label}</span>
+                              <span className="block text-xs text-muted-foreground">{option.description}</span>
+                            </Label>
+                          </div>
+                        ))}
                       </RadioGroup>
                     </div>
                   </DialogContent>
@@ -469,27 +476,15 @@ export default function ItemAvailabilityDemo() {
                           }}
                           className="space-y-2"
                         >
-                          <div className="flex items-center space-x-3 rounded-lg border p-3">
-                            <RadioGroupItem value="available" id="nasi-available" />
-                            <Label htmlFor="nasi-available" className="flex-1">
-                              <span className="font-medium">Available</span>
-                              <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3 rounded-lg border p-3">
-                            <RadioGroupItem value="today" id="nasi-today" />
-                            <Label htmlFor="nasi-today" className="flex-1">
-                              <span className="font-medium">Out for Today</span>
-                              <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3 rounded-lg border p-3">
-                            <RadioGroupItem value="indefinite" id="nasi-indefinite" />
-                            <Label htmlFor="nasi-indefinite" className="flex-1">
-                              <span className="font-medium">Off the menu</span>
-                              <span className="block text-xs text-muted-foreground">Item stays unavailable until reactivated</span>
-                            </Label>
-                          </div>
+                          {availabilityOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-3 rounded-lg border p-3">
+                              <RadioGroupItem value={option.value} id={`nasi-${option.value}`} />
+                              <Label htmlFor={`nasi-${option.value}`} className="flex-1">
+                                <span className="font-medium">{option.label}</span>
+                                <span className="block text-xs text-muted-foreground">{option.description}</span>
+                              </Label>
+                            </div>
+                          ))}
                         </RadioGroup>
                       </div>
                     </DialogContent>
@@ -530,27 +525,15 @@ export default function ItemAvailabilityDemo() {
                           }}
                           className="space-y-2"
                         >
-                          <div className="flex items-center space-x-3 rounded-lg border p-3">
-                            <RadioGroupItem value="available" id="mee-available" />
-                            <Label htmlFor="mee-available" className="flex-1">
-                              <span className="font-medium">Available</span>
-                              <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3 rounded-lg border p-3">
-                            <RadioGroupItem value="today" id="mee-today" />
-                            <Label htmlFor="mee-today" className="flex-1">
-                              <span className="font-medium">Out for Today</span>
-                              <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3 rounded-lg border p-3">
-                            <RadioGroupItem value="indefinite" id="mee-indefinite" />
-                            <Label htmlFor="mee-indefinite" className="flex-1">
-                              <span className="font-medium">Off the menu</span>
-                              <span className="block text-xs text-muted-foreground">Item stays unavailable until reactivated</span>
-                            </Label>
-                          </div>
+                          {availabilityOptions.map((option) => (
+                            <div key={option.value} className="flex items-center space-x-3 rounded-lg border p-3">
+                              <RadioGroupItem value={option.value} id={`mee-${option.value}`} />
+                              <Label htmlFor={`mee-${option.value}`} className="flex-1">
+                                <span className="font-medium">{option.label}</span>
+                                <span className="block text-xs text-muted-foreground">{option.description}</span>
+                              </Label>
+                            </div>
+                          ))}
                         </RadioGroup>
                       </div>
                     </DialogContent>
@@ -1056,27 +1039,15 @@ export default function ItemAvailabilityDemo() {
                                 }}
                                 className="space-y-2"
                               >
-                                <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                  <RadioGroupItem value="available" id={`${store.id}-${selectedItemForStock}-available`} />
-                                  <Label htmlFor={`${store.id}-${selectedItemForStock}-available`} className="flex-1">
-                                    <span className="font-medium">Available</span>
-                                    <span className="block text-xs text-muted-foreground">Item is available for ordering</span>
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                  <RadioGroupItem value="today" id={`${store.id}-${selectedItemForStock}-today`} />
-                                  <Label htmlFor={`${store.id}-${selectedItemForStock}-today`} className="flex-1">
-                                    <span className="font-medium">Out for Today</span>
-                                    <span className="block text-xs text-muted-foreground">Item will be back tomorrow at 12:00 AM</span>
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-3 rounded-lg border p-3">
-                                  <RadioGroupItem value="indefinite" id={`${store.id}-${selectedItemForStock}-indefinite`} />
-                                  <Label htmlFor={`${store.id}-${selectedItemForStock}-indefinite`} className="flex-1">
-                                    <span className="font-medium">Off the Menu</span>
-                                    <span className="block text-xs text-muted-foreground">Item stays unavailable until you reactivate it</span>
-                                  </Label>
-                                </div>
+                                {availabilityOptions.map((option) => (
+                                  <div key={option.value} className="flex items-center space-x-3 rounded-lg border p-3">
+                                    <RadioGroupItem value={option.value} id={`${store.id}-${selectedItemForStock}-${option.value}`} />
+                                    <Label htmlFor={`${store.id}-${selectedItemForStock}-${option.value}`} className="flex-1">
+                                      <span className="font-medium">{option.label}</span>
+                                      <span className="block text-xs text-muted-foreground">{option.description}</span>
+                                    </Label>
+                                  </div>
+                                ))}
                               </RadioGroup>
                             </div>
                           </DialogContent>
