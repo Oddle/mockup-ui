@@ -25,7 +25,7 @@ const availabilityOptions = [
   {
     value: "today",
     label: "Out for Today",
-    description: "Out of store here for today",
+    description: "Out of stock here today, available tomorrow.",
   },
   {
     value: "indefinite",
@@ -44,7 +44,7 @@ const categoryAvailabilityOptions = [
   {
     value: "today",
     label: "Out for Today",
-    description: "All items are out of stock for today.",
+    description: "All items are out of stock for today, available tomorrow.",
   },
   {
     value: "indefinite",
