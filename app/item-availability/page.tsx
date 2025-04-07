@@ -350,7 +350,7 @@ export default function ItemAvailabilityDemo() {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Edit Availability - Roti Prata</DialogTitle>
+                    <DialogTitle>Update Roti Prata Availability</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <RadioGroup
@@ -410,7 +410,7 @@ export default function ItemAvailabilityDemo() {
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Edit Category Availability - Main Course</DialogTitle>
+                      <DialogTitle>Update Main Course Availability</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       <RadioGroup
@@ -465,7 +465,7 @@ export default function ItemAvailabilityDemo() {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Edit Availability - Nasi Goreng</DialogTitle>
+                        <DialogTitle>Update Nasi Goreng Availability</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
                         <RadioGroup
@@ -514,7 +514,7 @@ export default function ItemAvailabilityDemo() {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Edit Availability - Mee Goreng</DialogTitle>
+                        <DialogTitle>Update Mee Goreng Availability</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4 py-4">
                         <RadioGroup
