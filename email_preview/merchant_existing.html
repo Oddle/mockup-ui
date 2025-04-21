@@ -80,12 +80,13 @@
             text-align: center;
         }
         .solutions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            /* Removed grid properties to stack cards vertically */
+            /* display: grid; */
+            /* grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); */
+            gap: 20px; /* Keep the gap for vertical spacing */
         }
         .solution-card {
-            padding: 20px;
+            padding: 24px;
             margin: 12px 0;
             border: 1px solid #eeeeee;
             border-radius: 6px;
@@ -122,8 +123,8 @@
             <img src="https://ucarecdn.com/7795ffb7-c75e-41a3-a7d3-ed32a221fce1/-/preview/194x80/" alt="Oddle Logo" style="height: 40px; width: auto;">
         </div>
 
-        <h1>Thank you for growing with us, {{firstName}}!</h1>
-        <p class="welcome-text">You have subscribed to the following products:</p>
+        <h1>Thank you for growing with us!</h1>
+        <p class="welcome-text">{{billingOrgName}} has subscribed to the following products:</p>
 
         <div class="section">
             <div class="solutions-grid">
@@ -132,13 +133,20 @@
                     <h3>{{name}}</h3>
                     <p>{{description}}</p>
 
-                    <ul style="margin-top: 10px;">
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 15px 0;">
+
+                    <ul style="margin-top: 10px; padding-left: 0; list-style: none;">
                         {{#each prices}}
-                        <li style="margin-bottom: 5px;">
-                            S${{value}} {{description}}
+                        <li style="margin-bottom: 8px; font-size: 14px; color: #555;">
+                           {{description}}
+                           <strong style="font-weight: 600; font-size: 16px; color: #333; margin-left: 5px;">S${{value}}</strong>
                         </li>
                         {{/each}}
                     </ul>
+
+                    <p style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; font-size: 14px; color: #555;">
+                       <strong style="font-weight: 600; color: #333;">Subscription Start Date:</strong> {{subscriptionStartDate}}
+                    </p>
 
                 </div>
                 {{/each}}
