@@ -17,8 +17,8 @@ import { useRouter } from "next/navigation"
 import { Info } from "lucide-react"
 
 const formSchema = z.object({
-  minOrder: z.number().min(0).default(50),
-  deliveryFee: z.number().min(0).default(5),
+  minOrder: z.number().min(0).default(60),
+  deliveryFee: z.number().min(0).default(6.8),
 })
 
 export default function DeliveryPage() {
@@ -27,14 +27,14 @@ export default function DeliveryPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      minOrder: 50,
-      deliveryFee: 5,
+      minOrder: 60,
+      deliveryFee: 6.8,
     },
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
-    router.push("/onboarding/menu")
+    router.push("/onboarding/engagements")
   }
 
   return (
@@ -51,15 +51,15 @@ export default function DeliveryPage() {
               ← Back
             </Button>
           </div>
-          <h2 className="text-2xl font-semibold">Where do you want to deliver to?</h2>
+          <h2 className="text-2xl font-semibold">Delivery Setup</h2>
           <p className="text-muted-foreground mt-2">
-            We have selected the recommended delivery options for your store for optimal profitability. You can always change or adjust these settings later.
+            Based on your location and industry data, we&apos;ve configured the optimal delivery settings to maximize your profitability. These settings are proven to work best for restaurants like yours.
           </p>
         </div>
 
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-medium mb-2">Recommended Delivery Options</h3>
+            <h3 className="text-lg font-medium mb-2">Optimized Delivery Configuration</h3>
             <div className="rounded-lg border p-6 space-y-6">
               <div>
                 <h4 className="font-medium mb-2">Deliver Islandwide in Singapore</h4>
@@ -83,8 +83,13 @@ export default function DeliveryPage() {
 
                     <div>
                       <h5 className="text-sm font-medium mb-2">What it means for you:</h5>
-                      <div className="text-sm text-muted-foreground">
-                        For an order size of ${form.watch("minOrder")}, your effective logistics cost is up to ${form.watch("deliveryFee")} or up to 18% of your revenue.
+                      <div className="space-y-2 text-sm text-muted-foreground">
+                        <div>
+                          For an order size of ${form.watch("minOrder")}, your effective logistics cost is up to ${form.watch("deliveryFee")} or up to {Math.round((form.watch("deliveryFee") / form.watch("minOrder")) * 100)}% of your revenue.
+                        </div>
+                        <div className="bg-green-50 text-green-700 p-2 rounded border border-green-200">
+                          💡 <strong>Good news:</strong> An average order size with Oddle is $120, making your effective logistics cost just {Math.round((form.watch("deliveryFee") / 120) * 100)}%.
+                        </div>
                       </div>
                     </div>
 
@@ -123,9 +128,10 @@ export default function DeliveryPage() {
                                 <Input
                                   type="number"
                                   min={0}
+                                  step="0.1"
                                   className="pl-7"
                                   {...field}
-                                  onChange={e => field.onChange(parseInt(e.target.value))}
+                                  onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
                                 />
                               </div>
                             </FormControl>
@@ -137,7 +143,7 @@ export default function DeliveryPage() {
                     <div className="rounded-lg bg-blue-50 p-4 flex gap-2">
                       <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
                       <div className="text-sm text-blue-700">
-                        We recommend starting with these settings and adjusting them to your needs later. Or approach your account managers or email us to set up a helpline session where we show you how to adjust your delivery settings for optimal profitability.
+                        These settings are optimized based on successful restaurants in your area. Our data shows this configuration delivers the best balance of order volume and profitability for businesses like yours.
                       </div>
                     </div>
                   </div>
@@ -160,7 +166,7 @@ export default function DeliveryPage() {
                     <Button 
                       variant="ghost"
                       className="w-full text-muted-foreground"
-                      onClick={() => router.push("/onboarding/menu")}
+                      onClick={() => router.push("/onboarding/engagements")}
                     >
                       Skip to Next Step
                     </Button>

@@ -40,7 +40,7 @@ import { useSearchParams } from "next/navigation"
 function MenuForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const nextPage = searchParams.get("next") || "/onboarding/contact"
+  const nextPage = searchParams.get("next") || "/onboarding/complete"
   const [isImporting, setIsImporting] = useState(false)
   
   const form = useForm<FormValues>({
@@ -188,7 +188,12 @@ function MenuForm() {
                   type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => router.back()}
+                  onClick={() => {
+                    // Go back to the appropriate previous step based on the flow
+                    // Since menu is the last step, it could come from either delivery or pickup
+                    // For simplicity, go back to order-types where users can reconfigure
+                    router.push("/onboarding/order-types")
+                  }}
                 >
                   Back
                 </Button>

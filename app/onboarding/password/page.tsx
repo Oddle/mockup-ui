@@ -33,7 +33,7 @@ const formSchema = z.object({
   path: ["confirmPassword"],
 })
 
-export default function PasswordPage() {
+export default function PasswordSetupPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -41,8 +41,8 @@ export default function PasswordPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      password: "",
-      confirmPassword: "",
+      password: "Welcome123!",
+      confirmPassword: "Welcome123!",
     },
   })
 
@@ -55,9 +55,9 @@ export default function PasswordPage() {
     <Card>
       <CardContent className="pt-6 space-y-8">
         <div>
-          <h2 className="text-2xl font-semibold">Set Your Password</h2>
+          <h2 className="text-2xl font-semibold">Create Your Password</h2>
           <p className="text-muted-foreground mt-2">
-            Create a secure password for your Oddle account
+            Let&apos;s get started by setting up a secure password for your new Oddle account
           </p>
         </div>
 
@@ -140,7 +140,7 @@ export default function PasswordPage() {
             />
 
             <Button type="submit" className="w-full">
-              Set Password and Continue
+              Create Password and Continue
             </Button>
           </form>
         </Form>

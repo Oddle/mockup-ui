@@ -23,9 +23,15 @@ export default function Home() {
     },
     { 
       name: "Onboarding", 
-      path: "/onboarding/password",
-      description: "Set up merchant password and security",
+      path: "/onboarding",
+      description: "Merchant onboarding with multiple entry points",
       icon: KeyRound
+    },
+    { 
+      name: "Onboarding Complete", 
+      path: "/onboarding/complete",
+      description: "View business research data showcase",
+      icon: ClipboardCheck
     },
     { 
       name: "Prefill", 

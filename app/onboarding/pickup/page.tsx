@@ -138,7 +138,7 @@ function PickupForm() {
     if (hasDelivery) {
       router.push("/onboarding/delivery")
     } else {
-      router.push("/onboarding/menu")
+      router.push("/onboarding/engagements")
     }
   }
 
@@ -309,7 +309,7 @@ function PickupForm() {
                       if (hasDelivery) {
                         router.push("/onboarding/delivery")
                       } else {
-                        router.push("/onboarding/menu")
+                        router.push("/onboarding/engagements")
                       }
                     }}
                   >

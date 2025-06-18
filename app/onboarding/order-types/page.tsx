@@ -8,7 +8,7 @@ import { useState } from "react"
 
 export default function OrderTypesPage() {
   const router = useRouter()
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(["pickup", "delivery"])
 
   const orderTypes = [
     {
